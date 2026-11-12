@@ -20,8 +20,8 @@ require (
 	github.com/rs/zerolog v1.21.0
 	github.com/txchat/im-pkg v0.0.1
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
-	github.com/web3chat/txchat/dtalk v0.0.0
-	github.com/web3chat/txchat/imparse v0.0.0
+	github.com/web3chat/txchat/dtalk v0.1.0
+	github.com/web3chat/txchat/imparse v0.1.0
 	github.com/zhenjl/cityhash v0.0.0-20131128155616-cdd6a94144ab
 	go.etcd.io/etcd/api/v3 v3.5.0
 	go.etcd.io/etcd/client/v3 v3.5.0

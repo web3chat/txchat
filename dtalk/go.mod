@@ -47,8 +47,8 @@ require (
 	github.com/tencentyun/tls-sig-api-v2-golang v1.2.0
 	github.com/txchat/im-pkg v0.0.1
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
-	github.com/web3chat/txchat/im v0.0.0
-	github.com/web3chat/txchat/imparse v0.0.0
+	github.com/web3chat/txchat/im v0.1.0
+	github.com/web3chat/txchat/imparse v0.1.0
 	go.etcd.io/etcd/api/v3 v3.5.0
 	go.etcd.io/etcd/client/v3 v3.5.0
 	golang.org/x/crypto v0.39.0
