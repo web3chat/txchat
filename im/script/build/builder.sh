@@ -44,7 +44,8 @@ golangOsArch() {
 
 ldflagsOfInject() {
   versionFilePath="main"
-  projectVersion=$(git describe --abbrev=8 --tags 2>/dev/null || git rev-parse --short=8 HEAD)
+  # 只匹配 v* 根标签，避免子模块 tag（如 im/v0.1.0）带斜杠污染镜像 tag。
+  projectVersion=$(git describe --abbrev=8 --tags --match 'v*' 2>/dev/null || git rev-parse --short=8 HEAD)
   goVersion=$(go version | awk '{ print $3 }')
   gitCommit=$(git rev-parse --short=8 HEAD)
   buildTime=$(date "+%Y-%m-%d %H:%M:%S %Z")

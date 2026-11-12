@@ -1,8 +1,9 @@
 # golang1.17 or latest
 TARGETDIR=target
 
-# 无 tag 时回退到短 commit，避免镜像 tag 变成 txchat-xxx:
-projectVersion=$(shell git describe --abbrev=8 --tags 2>/dev/null || git rev-parse --short=8 HEAD)
+# 只匹配 v* 根标签：子模块 tag（如 im/v0.1.0）带斜杠，不能用作镜像 tag。
+# 无匹配 tag 时回退到短 commit，避免镜像 tag 变成 txchat-xxx:
+projectVersion=$(shell git describe --abbrev=8 --tags --match 'v*' 2>/dev/null || git rev-parse --short=8 HEAD)
 gitCommit=$(shell git rev-parse --short=8 HEAD)
 ifeq ($(strip $(projectVersion)),)
 projectVersion := unknown

@@ -1,5 +1,6 @@
 TARGETDIR=target
-projectVersion=$(shell git describe --abbrev=8 --tags 2>/dev/null || git rev-parse --short=8 HEAD 2>/dev/null || echo unknown)
+# 只匹配 v* 根标签，避免子模块 tag（如 dtalk/service/square/v0.1.0）带斜杠污染镜像 tag。
+projectVersion=$(shell git describe --abbrev=8 --tags --match 'v*' 2>/dev/null || git rev-parse --short=8 HEAD 2>/dev/null || echo unknown)
 COMPOSE := $(shell docker compose version >/dev/null 2>&1 && echo "docker compose" || echo docker-compose)
 
 .PHONY: help build test check-auth-sync tidy image pg run compose-up compose-down migrate-pack migrate-restore clean strip-appledouble

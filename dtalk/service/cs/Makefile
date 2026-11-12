@@ -6,7 +6,8 @@
 # 5. make run         — 本地运行
 
 APP_NAME := cs
-VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+# 只匹配 v* 根标签，避免子模块 tag（如 dtalk/v0.1.0）带斜杠进入包名。
+VERSION := $(shell git describe --tags --always --dirty --match 'v*' 2>/dev/null || echo "dev")
 BUILD_DIR := build
 APP := ${BUILD_DIR}/${APP_NAME}_v${VERSION}
 TOOLS_APP := ${BUILD_DIR}/${APP_NAME}-tools_v${VERSION}
