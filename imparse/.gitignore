@@ -1,0 +1,14 @@
+.idea/
+build/
+target/
+
+# macOS AppleDouble / metadata
+.DS_Store
+._*
+**/._*
+
+# local runtime
+*.log
+*.pid
+.env
+.env.local

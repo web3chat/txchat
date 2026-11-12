@@ -1,0 +1,52 @@
+# chatclean Docker Compose 部署配置
+# 用法:
+#   cp .env.example .env  # 按需修改环境变量
+#   docker compose up -d --build
+#
+# 构建上下文指向 dtalk 模块根目录（../../.. 相对于本文件）
+
+services:
+  chatclean:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BINARY_NAME: ${BINARY_NAME:-chatclean}
+    image: txchat/chatclean:latest
+    container_name: chatclean
+    ports:
+      - "${GRPC_HOST_PORT:-30010}:30010"
+    environment:
+      DTALKENV: ${DTALKENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      REGADDRS: ${REGADDRS:-etcd:2379}
+      REGISTER_ADDR: ${REGISTER_ADDR:-}
+      MYSQL_HOST: ${MYSQL_HOST:-mysql}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PWD: ${MYSQL_PWD:-}
+      MYSQL_DB: ${MYSQL_DB:-dtalk}
+      MYSQL_RECORD_DB: ${MYSQL_RECORD_DB:-dtalk_record}
+      SCHEDULER_INTERVAL: ${SCHEDULER_INTERVAL:-1h}
+      SCHEDULER_BATCH_SIZE: ${SCHEDULER_BATCH_SIZE:-500}
+      REDIS_ADDR: ${REDIS_ADDR:-txchat-redis:6379}
+      REDIS_AUTH: ${REDIS_AUTH:-}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-txchat-minio:9000}
+      MINIO_BUCKET: ${MINIO_BUCKET:-dtalk-minio-bucket}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-}
+    volumes:
+      - ./chatclean-docker.toml:/app/etc/chatclean.toml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 30010"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - chatclean-net
+
+networks:
+  chatclean-net:
+    driver: bridge

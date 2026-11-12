@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谈信 ChatAdmin · 运营台</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect rx='8' width='32' height='32' fill='%230d9488'/%3E%3Cpath d='M9 23V9h5.2c2.5 0 4 1.3 4 3.3 0 1.4-.8 2.5-2 3 1.5.4 2.4 1.6 2.4 3.2 0 2.2-1.7 3.5-4.4 3.5H9z' fill='none' stroke='%23fff' stroke-width='2.1' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-modern.css">
+    <link rel="stylesheet" href="css/theme-unified.css?v=20260509b">
+    <link rel="stylesheet" href="css/admin-shell.css?v=20260727">
+    <link rel="stylesheet" href="css/chatadmin-ui.css?v=20261110h">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 登录页面（未登录时显示） -->
+    <div id="login-page" class="login-page">
+        <div id="login-error-overlay" class="login-error-overlay"></div>
+        <aside class="login-brand">
+            <div class="login-brand-inner">
+                <div class="brand-mark" aria-hidden="true">谈</div>
+                <p class="eyebrow">ChatAdmin</p>
+                <h1>谈信运营台</h1>
+                <p class="lead">管理群组、查看活跃趋势、查询用户与登录审计。与广场运营台同一套布局。</p>
+                <ul class="login-points">
+                    <li>群组状态、容量与成员一览</li>
+                    <li>日活地址与日活群组趋势</li>
+                    <li>地址绑定与全站登录审计</li>
+                </ul>
+            </div>
+        </aside>
+        <section class="login-panel">
+            <div class="login-card">
+                <p class="eyebrow">管理员登录</p>
+                <h2>欢迎回来</h2>
+                <p class="muted">使用钱包签名进入谈信管理台</p>
+                <button type="button" class="btn-login" onclick="connectWallet()">
+                    <i class="fas fa-wallet"></i>
+                    <span>连接钱包登录</span>
+                </button>
+                <p class="login-hint">需要浏览器安装 MetaMask</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- 业务页面（登录后显示） -->
+    <div id="app-container" class="app-container" style="display: none;">
+        <div class="ca-sidebar-backdrop" id="ca-sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+        <aside class="ca-sidebar" id="ca-sidebar">
+            <div class="ca-brand">
+                <div class="brand-mark" aria-hidden="true">谈</div>
+                <div class="ca-brand-text">
+                    <span class="ca-brand-name">谈信</span>
+                    <span class="ca-brand-sub">ChatAdmin</span>
+                </div>
+            </div>
+            <nav class="ca-nav" aria-label="主导航">
+                <div class="nav-group">
+                    <p class="ca-nav-label">总览</p>
+                    <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="13.5" y="3.5" width="7" height="16.5" rx="1.4"/><rect x="3.5" y="13.5" width="7" height="6.5" rx="1.4"/></svg>
+                        <span>工作台</span>
+                    </a>
+                    <a href="#activity" class="nav-link" data-section="activity">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16"/><path d="M5 15l4.2-5.2 3.2 3.4L19 7"/></svg>
+                        <span>活跃趋势</span>
+                    </a>
+                </div>
+                <div class="nav-group">
+                    <p class="ca-nav-label">运营</p>
+                    <a href="#groups" class="nav-link" data-section="groups">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.6"/><circle cx="16" cy="9" r="2.1"/><path d="M4.8 18.5c.5-2.4 2.4-3.8 4.2-3.8s3.7 1.4 4.2 3.8"/><path d="M14 14.8c1.5-.2 3 .8 3.6 2.7"/></svg>
+                        <span>群组管理</span>
+                    </a>
+                </div>
+                <div class="nav-group">
+                    <p class="ca-nav-label">审计</p>
+                    <a href="#userlogin" class="nav-link" data-section="userlogin">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.2"/><path d="M14.6 14.6 19.5 19.5"/></svg>
+                        <span>用户查询</span>
+                    </a>
+                    <a href="#loginlogs" class="nav-link" data-section="loginlogs">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11M8 12h11M8 17h7"/><path d="M5 7h.01M5 12h.01M5 17h.01"/></svg>
+                        <span>登录日志</span>
+                    </a>
+                    <a href="#audits" class="nav-link" data-section="audits">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg>
+                        <span>操作留痕</span>
+                    </a>
+                </div>
+                <div class="nav-group">
+                    <p class="ca-nav-label">系统</p>
+                    <a href="#settings" class="nav-link" data-section="settings">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H8a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V8c.3.6.9 1 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+                        <span>系统设置</span>
+                    </a>
+                </div>
+            </nav>
+            <div class="ca-sidebar-foot">
+                <div id="admin-area" class="user-chip">
+                    <span class="avatar">—</span>
+                    <span class="user-meta"><strong>未登录</strong><small>请连接钱包</small></span>
+                </div>
+            </div>
+        </aside>
+
+        <header class="ca-topbar">
+            <button type="button" class="ca-menu-toggle" onclick="toggleSidebar()" aria-label="打开菜单">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="page-head">
+                <h1 class="ca-page-title" id="ca-page-title">工作台</h1>
+                <p class="ca-page-desc" id="ca-page-desc">群组、用户与日活一屏掌握</p>
+            </div>
+            <div class="ca-topbar-right">
+                <span class="dash-sync" id="dash-last-update">同步中…</span>
+                <div class="ca-refresh-mode" role="group" aria-label="数据刷新方式">
+                    <button type="button" id="ca-refresh-manual" onclick="setRefreshMode('manual')">手动</button>
+                    <button type="button" id="ca-refresh-auto" onclick="setRefreshMode('auto')">自动</button>
+                </div>
+                <button type="button" class="btn btn-secondary" id="ca-refresh" onclick="refreshCurrent()">刷新</button>
+                <button type="button" class="btn btn-secondary" onclick="logoutAdmin()">退出</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+        <div id="security-feed" class="security-feed" hidden></div>
+        <!-- 仪表盘页面 -->
+        <section id="dashboard" class="content-section active">
+            <div class="stat-grid">
+                <article class="stat-card">
+                    <div class="k">总群组</div>
+                    <div class="v" id="total-groups">-</div>
+                    <div class="s">全部群聊</div>
+                </article>
+                <article class="stat-card">
+                    <div class="k">总用户</div>
+                    <div class="v" id="total-users">-</div>
+                    <div class="s">已记录地址</div>
+                </article>
+                <article class="stat-card">
+                    <div class="k">今日新增群聊</div>
+                    <div class="v" id="today-groups">-</div>
+                    <div class="s">当日创建</div>
+                </article>
+                <article class="stat-card">
+                    <div class="k">今日新增用户</div>
+                    <div class="v" id="today-new-users">-</div>
+                    <div class="s">当日新地址</div>
+                </article>
+            </div>
+            <div class="stat-grid stat-grid-follow">
+                <article class="stat-card stat-card--link" title="点击查看当日地址与群聊" onclick="openDailyActiveDetail('')">
+                    <div class="k">今日活跃地址</div>
+                    <div class="v" id="today-active-users">-</div>
+                    <div class="s" id="today-active-users-ratio">-</div>
+                </article>
+                <article class="stat-card stat-card--link" title="点击查看当日地址与群聊" onclick="openDailyActiveDetail('')">
+                    <div class="k">今日活跃群组</div>
+                    <div class="v" id="today-active-groups">-</div>
+                    <div class="s" id="today-active-groups-ratio">-</div>
+                </article>
+                <article class="panel dash-status-panel">
+                    <header class="panel-head">
+                        <h2>群组状态</h2>
+                    </header>
+                    <div class="dash-ring-row">
+                        <div class="dash-ring-outer">
+                            <div class="dash-ring" id="dash-status-ring" role="img" aria-label="群组状态占比"></div>
+                            <div class="dash-ring-center"></div>
+                        </div>
+                        <ul class="dash-legend">
+                            <li><span class="dash-dot dash-dot--ok"></span> 正常 <strong id="active-groups">-</strong></li>
+                            <li><span class="dash-dot dash-dot--ban"></span> 封禁 <strong id="banned-groups">-</strong></li>
+                            <li><span class="dash-dot dash-dot--off"></span> 解散 <strong id="dissolved-groups">-</strong></li>
+                        </ul>
+                    </div>
+                </article>
+            </div>
+            <div class="split">
+                <article class="panel">
+                    <header class="panel-head">
+                        <h2>快捷入口</h2>
+                    </header>
+                    <div class="dash-actions-row">
+                        <button type="button" class="dash-chip" onclick="showSection('groups')">
+                            <span>群组管理</span>
+                        </button>
+                        <button type="button" class="dash-chip" onclick="showSection('activity')">
+                            <span>活跃趋势</span>
+                        </button>
+                        <button type="button" class="dash-chip" onclick="showSection('userlogin')">
+                            <span>用户查询</span>
+                        </button>
+                        <button type="button" class="dash-chip" onclick="showSection('loginlogs')">
+                            <span>登录日志</span>
+                        </button>
+                    </div>
+                </article>
+                <article class="panel ca-metrics-panel">
+                    <header class="panel-head ca-metrics-head">
+                        <div>
+                            <h2>近 14 日活跃概览</h2>
+                            <p>系统定时汇总日活数据</p>
+                        </div>
+                        <button class="link-btn" type="button" onclick="showSection('activity')">查看全部</button>
+                    </header>
+                    <canvas id="dash-activity-chart" class="ca-chart" width="960" height="180"></canvas>
+                </article>
+            </div>
+        </section>
+
+        <!-- 群组管理页面 -->
+        <section id="groups" class="content-section">
+            <div class="page-header">
+                <h1><i class="fas fa-users"></i> 群组管理</h1>
+                <p>管理群组信息和状态</p>
+            </div>
+
+            <!-- 搜索和筛选 -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <input type="text" id="group-search" placeholder="搜索群组名称或ID..." class="search-input">
+                    <select id="group-status-filter" class="filter-select">
+                        <option value="">全部状态</option>
+                        <option value="0">正常</option>
+                        <option value="1">封禁</option>
+                        <option value="2">解散</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="searchGroups()">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshGroups()">
+                        <i class="fas fa-sync-alt"></i> 刷新
+                    </button>
+                </div>
+            </div>
+
+            <!-- 群组列表 -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>群组ID</th>
+                            <th>群组名称</th>
+                            <th>成员数</th>
+                            <th>最大人数</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groups-table-body">
+                        <!-- 数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="groups-pagination">
+                <!-- 分页控件将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 白名单管理页面：入口已隐藏，页面保留以便以后打开 -->
+        <section id="whitelist" class="content-section feature-hidden" hidden>
+            <div class="page-header">
+                <h1><i class="fas fa-user-check"></i> 白名单管理</h1>
+                <p>管理群组创建白名单</p>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="showAddWhitelistModal()">
+                    <i class="fas fa-plus"></i> 添加白名单
+                </button>
+                <button class="btn btn-secondary" onclick="refreshWhitelist()">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+
+            <!-- 查询功能 -->
+            <div class="search-section app-panel">
+                <h3>
+                    <i class="fas fa-search"></i> 根据地址查询
+                </h3>
+                <div class="app-flex-row">
+                    <input 
+                        type="text" 
+                        id="address-search-input" 
+                        placeholder="请输入用户地址（0x...）" 
+                        class="form-input" 
+                        style="flex: 1; max-width: 500px;"
+                        onkeypress="if(event.key === 'Enter') searchByAddress()"
+                    >
+                    <button class="btn btn-primary" onclick="searchByAddress()">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearSearchResult()">
+                        <i class="fas fa-times"></i> 清除
+                    </button>
+                </div>
+            </div>
+
+            <!-- 查询结果展示区域 -->
+            <div id="address-search-result" style="display: none; margin: 20px 0;">
+                <!-- 白名单信息 -->
+                <div id="whitelist-search-result" class="app-panel app-panel-stack">
+                    <h3>
+                        <i class="fas fa-user-check"></i> 白名单信息
+                    </h3>
+                    <div id="whitelist-search-content"></div>
+                </div>
+
+                <!-- 创建的群聊信息 -->
+                <div id="groups-search-result" class="app-panel">
+                    <h3>
+                        <i class="fas fa-users"></i> 创建的群聊信息
+                    </h3>
+                    <div id="groups-search-content"></div>
+                </div>
+            </div>
+
+            <!-- 白名单列表 -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户地址</th>
+                            <th>备注</th>
+                            <th>最大成员数</th>
+                            <th>最大创建群聊个数</th>
+                            <th>状态</th>
+                            <th>授权人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="whitelist-table-body">
+                        <!-- 数据将通过JavaScript动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination" id="whitelist-pagination">
+                <!-- 分页控件将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 系统设置页面 -->
+        <section id="settings" class="content-section">
+            <div class="page-header">
+                <h1><i class="fas fa-cog"></i> 系统设置</h1>
+                <p>配置API连接和系统参数</p>
+            </div>
+
+            <div class="settings-container">
+                <div class="setting-group">
+                    <h3>API配置</h3>
+                    <div class="form-group">
+                        <label for="api-base-url">API基础URL</label>
+                        <input type="text" id="api-base-url" value="http://localhost:18020" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="api-timeout">请求超时时间(秒)</label>
+                        <input type="number" id="api-timeout" value="30" class="form-input">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> 保存设置
+                    </button>
+                </div>
+
+                <div class="setting-group">
+                    <h3>系统信息</h3>
+                    <div class="info-item">
+                        <span class="info-label">版本:</span>
+                        <span class="info-value">v1.0.0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">最后更新:</span>
+                        <span class="info-value" id="last-update">-</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 活跃趋势页面 -->
+        <section id="activity" class="content-section">
+            <div class="page-header">
+                <h1>活跃趋势</h1>
+                <p>查看日活用户与日活群组的历史趋势（系统定时汇总）</p>
+            </div>
+            <div class="ca-metrics-panel" style="margin-top:0;">
+                <div class="ca-metrics-head">
+                    <div>
+                        <h2>历史日活</h2>
+                        <p>支持按日期范围查询与筛选</p>
+                    </div>
+                    <div class="ca-metrics-filters">
+                        <input type="date" id="activity-start-date" />
+                        <span class="ca-range-sep">至</span>
+                        <input type="date" id="activity-end-date" />
+                        <button class="btn btn-primary" type="button" onclick="loadDailyActiveHistory()">查询</button>
+                        <button class="btn btn-secondary" type="button" onclick="snapshotDailyActiveNow()">立即快照</button>
+                    </div>
+                </div>
+                <canvas id="activity-chart" class="ca-chart" width="960" height="220"></canvas>
+                <div class="table-container" style="box-shadow:none!important;border:none!important;background:transparent!important;">
+                    <table class="ca-metrics-table">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>日活用户</th>
+                                <th>日活群组</th>
+                                <th>总用户</th>
+                                <th>总群组</th>
+                                <th>更新时间</th>
+                                <th>明细</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-table-body">
+                            <tr><td colspan="7" class="ca-metrics-empty">加载中…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用户查询页面 -->
+        <section id="userlogin" class="content-section">
+            <div class="page-header">
+                <h1><i class="fas fa-history"></i> 用户查询</h1>
+                <p>按链上地址查询账号绑定信息与登录审计记录（登录记录只保留最近 2 个月）</p>
+            </div>
+
+            <!-- 搜索栏 -->
+            <div class="search-bar app-panel app-ul-search">
+                <div class="app-ul-toolbar">
+                    <div class="form-group app-ul-fg-address">
+                        <label for="ul-address-input">用户地址</label>
+                        <input type="text" id="ul-address-input" class="form-input"
+                            placeholder="请输入链上地址，按 Enter 或点击查询">
+                    </div>
+                    <div class="form-group app-ul-fg-time">
+                        <label for="ul-start-time">开始时间</label>
+                        <input type="datetime-local" id="ul-start-time" class="form-input">
+                    </div>
+                    <div class="form-group app-ul-fg-time">
+                        <label for="ul-end-time">结束时间</label>
+                        <input type="datetime-local" id="ul-end-time" class="form-input">
+                    </div>
+                    <div class="form-group app-ul-fg-size">
+                        <label for="ul-page-size">每页条数</label>
+                        <select id="ul-page-size" class="form-input">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <button type="button" id="ul-search-btn" class="btn btn-primary app-ul-search-btn">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 账号绑定信息 -->
+            <div class="card app-card-spaced">
+                <div class="card-header">
+                    <h3><i class="fas fa-id-card"></i> 账号绑定信息</h3>
+                </div>
+                <div class="card-body" id="ul-binding-card">
+                    <div class="ul-no-binding app-empty-hint">
+                        请输入地址后查询
+                    </div>
+                </div>
+            </div>
+
+            <!-- 登录记录 -->
+            <div class="card">
+                <div class="card-header app-card-header-row">
+                    <h3><i class="fas fa-sign-in-alt"></i> 登录记录</h3>
+                    <span id="ul-total" class="app-muted-caption"></span>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>登录时间</th>
+                                <th>IP 地址</th>
+                                <th>国家</th>
+                                <th>城市/区域</th>
+                                <th>网络服务商</th>
+                                <th>设备类型</th>
+                                <th>设备名称/型号</th>
+                                <th>设备UUID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ul-log-tbody">
+                            <tr><td colspan="8" class="app-table-empty">请输入地址后查询</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="ul-pagination" class="pagination app-pagination-tight"></div>
+            </div>
+        </section>
+
+        <!-- 全站登录日志 -->
+        <section id="loginlogs" class="content-section">
+            <div class="page-header">
+                <h1><i class="fas fa-list-alt"></i> 全站登录日志</h1>
+                <p>分页查看全站用户登录审计记录；只保留最近 2 个月，可按时间范围与用户地址筛选（多地址为或条件）</p>
+            </div>
+
+            <div class="search-bar app-panel app-ul-search">
+                <div class="app-ul-toolbar">
+                    <div class="form-group app-ul-fg-address" style="flex: 2; min-width: 220px;">
+                        <label for="ll-uid-filter">用户地址（可选）</label>
+                        <textarea id="ll-uid-filter" class="form-input" rows="2"
+                            placeholder="留空表示全部用户；多个地址可用逗号或换行分隔"></textarea>
+                    </div>
+                    <div class="form-group app-ul-fg-time">
+                        <label for="ll-start-time">开始时间</label>
+                        <input type="datetime-local" id="ll-start-time" class="form-input">
+                    </div>
+                    <div class="form-group app-ul-fg-time">
+                        <label for="ll-end-time">结束时间</label>
+                        <input type="datetime-local" id="ll-end-time" class="form-input">
+                    </div>
+                    <div class="form-group app-ul-fg-size">
+                        <label for="ll-page-size">每页条数</label>
+                        <select id="ll-page-size" class="form-input">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <button type="button" id="ll-search-btn" class="btn btn-primary app-ul-search-btn">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header app-card-header-row">
+                    <h3><i class="fas fa-sign-in-alt"></i> 登录记录</h3>
+                    <span id="ll-total" class="app-muted-caption"></span>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>用户地址</th>
+                                <th>登录时间</th>
+                                <th>IP 地址</th>
+                                <th>国家</th>
+                                <th>城市/区域</th>
+                                <th>网络服务商</th>
+                                <th>设备类型</th>
+                                <th>设备名称/型号</th>
+                                <th>设备UUID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ll-log-tbody">
+                            <tr><td colspan="9" class="app-table-empty">加载中…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="ll-pagination" class="pagination app-pagination-tight"></div>
+            </div>
+        </section>
+
+        <section id="audits" class="content-section">
+            <div class="page-header">
+                <h1>操作留痕</h1>
+                <p>管理员登录、修改群组、删除白名单等写操作记录</p>
+            </div>
+            <div class="search-bar app-panel app-ul-search">
+                <div class="app-ul-toolbar">
+                    <div class="form-group app-ul-fg-address">
+                        <label for="audit-action">动作</label>
+                        <input type="text" id="audit-action" class="form-input" placeholder="可填多个，空格或逗号分隔，如 login_ok delete_whitelist">
+                    </div>
+                    <div class="form-group app-ul-fg-size">
+                        <label for="audit-target-type">对象</label>
+                        <input type="text" id="audit-target-type" class="form-input" placeholder="group whitelist，可多个">
+                    </div>
+                    <div class="form-group app-ul-fg-address">
+                        <label for="audit-target-id">对象 ID</label>
+                        <input type="text" id="audit-target-id" class="form-input" placeholder="群 ID、白名单 ID 或地址">
+                    </div>
+                    <div class="form-group app-ul-fg-address">
+                        <label for="audit-operator">操作人</label>
+                        <input type="text" id="audit-operator" class="form-input" placeholder="管理员地址">
+                    </div>
+                    <div class="form-group app-ul-fg-size">
+                        <label for="audit-page-size">每页条数</label>
+                        <select id="audit-page-size" class="form-input">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <button type="button" id="audit-search-btn" class="btn btn-primary app-ul-search-btn">查询</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header app-card-header-row">
+                    <h3>操作记录</h3>
+                    <span id="audit-total" class="app-muted-caption"></span>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>操作人</th>
+                                <th>动作</th>
+                                <th>对象</th>
+                                <th>说明</th>
+                                <th>IP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-tbody">
+                            <tr><td colspan="6" class="app-table-empty">打开本页后加载</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="audit-pagination" class="pagination app-pagination-tight"></div>
+            </div>
+        </section>
+        </main>
+
+        <!-- 模态框 -->
+    <!-- 添加白名单模态框 -->
+    <div id="add-whitelist-modal" class="modal feature-hidden" hidden>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加白名单</h3>
+                <button class="modal-close" onclick="closeModal('add-whitelist-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-whitelist-form">
+                    <div class="form-group">
+                        <label for="whitelist-address">用户地址 *</label>
+                        <input type="text" id="whitelist-address" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="whitelist-remark">备注</label>
+                        <input type="text" id="whitelist-remark" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="whitelist-max-members">最大成员数 *</label>
+                        <input type="number" id="whitelist-max-members" required min="1" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="whitelist-max-groups">最大创建群聊个数 *</label>
+                        <input type="number" id="whitelist-max-groups" required min="1" class="form-input" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="whitelist-created-by">授权人 *</label>
+                        <input type="text" id="whitelist-created-by" required class="form-input">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('add-whitelist-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitAddWhitelist()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑白名单模态框 -->
+    <div id="edit-whitelist-modal" class="modal feature-hidden" hidden>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑白名单</h3>
+                <button class="modal-close" onclick="closeModal('edit-whitelist-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-whitelist-form">
+                    <input type="hidden" id="edit-whitelist-id">
+                    <div class="form-group">
+                        <label for="edit-whitelist-address">用户地址</label>
+                        <input type="text" id="edit-whitelist-address" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-whitelist-remark">备注</label>
+                        <input type="text" id="edit-whitelist-remark" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-whitelist-max-members">最大成员数</label>
+                        <input type="number" id="edit-whitelist-max-members" min="1" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-whitelist-max-groups">最大创建群聊个数</label>
+                        <input type="number" id="edit-whitelist-max-groups" min="1" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-whitelist-status">状态</label>
+                        <select id="edit-whitelist-status" class="form-input">
+                            <option value="0">禁用</option>
+                            <option value="1">启用</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('edit-whitelist-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitEditWhitelist()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 每日活跃明细 -->
+    <div id="daily-active-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="daily-active-modal-title">每日活跃明细</h3>
+                <button class="modal-close" type="button" onclick="closeModal('daily-active-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="da-detail-grid">
+                    <section>
+                        <div class="app-card-header-row">
+                            <h4>活跃地址</h4>
+                            <span id="da-address-total" class="app-muted-caption"></span>
+                        </div>
+                        <ul id="da-address-list" class="da-detail-list"></ul>
+                        <div id="da-address-pager" class="pagination"></div>
+                    </section>
+                    <section>
+                        <div class="app-card-header-row">
+                            <h4>群聊名称</h4>
+                            <span id="da-group-total" class="app-muted-caption"></span>
+                        </div>
+                        <ul id="da-group-list" class="da-detail-list"></ul>
+                        <div id="da-group-pager" class="pagination"></div>
+                    </section>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="closeModal('daily-active-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 群组详情模态框 -->
+    <div id="group-detail-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>群组详情</h3>
+                <button class="modal-close" onclick="closeModal('group-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="group-detail-content">
+                    <!-- 群组详情内容将通过JavaScript动态加载 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('group-detail-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载提示 -->
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <!-- 通知提示（放在app-container外面，确保登录页面也能显示） -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="notification-message">操作成功</span>
+        </div>
+    </div>
+
+    <!-- JavaScript：config.js 须先于 api / update-config，BASE_URL 才会生效 -->
+    <script src="config.js?v=20251029"></script>
+    <script src="update-config.js?v=20251029"></script>
+    <script src="js/api.js?v=20261110h"></script>
+    <script src="js/auth.js?v=20261110g"></script>
+    <script src="js/app.js?v=20261110g"></script>
+    <script src="js/security.js?v=20261110"></script>
+    <script src="js/groups.js"></script>
+    <script src="js/whitelist.js"></script>
+    <script src="js/userlogin.js?v=20261110f"></script>
+    <script src="js/audits.js?v=20261110g"></script>
+    <script src="js/loginlogs-all.js?v=20260509b"></script>
+    <script src="js/dailyactive.js?v=20261110h"></script>
+    <script>
+        // 初始化用户查询模块
+        document.addEventListener('DOMContentLoaded', function () {
+            userLoginModule.init();
+            loginLogsAllModule.init();
+            auditsModule.init();
+        });
+    </script>
+</body>
+</html>

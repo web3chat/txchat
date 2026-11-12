@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>群组管理API测试</h1>
+    
+    <div class="test-section">
+        <h3>1. 测试CORS和基础连接</h3>
+        <button class="test-button" onclick="testCORS()">测试CORS</button>
+        <div id="cors-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 测试群组统计API</h3>
+        <button class="test-button" onclick="testGroupStats()">获取群组统计</button>
+        <div id="stats-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. 测试群组列表API</h3>
+        <button class="test-button" onclick="testGroupList()">获取群组列表</button>
+        <div id="list-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 测试群组详情API</h3>
+        <input type="number" id="groupId" placeholder="群组ID" value="1">
+        <button class="test-button" onclick="testGroupInfo()">获取群组详情</button>
+        <div id="info-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. 测试群组更新API</h3>
+        <input type="number" id="updateGroupId" placeholder="群组ID" value="1">
+        <input type="text" id="groupName" placeholder="新群组名称" value="测试群组">
+        <button class="test-button" onclick="testUpdateGroup()">更新群组名称</button>
+        <div id="update-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:18020/api/v1/groupmanage';
+        
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${API_BASE}${endpoint}`;
+            const defaultOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            
+            const config = { ...defaultOptions, ...options };
+            
+            try {
+                console.log('发送请求:', url, config);
+                const response = await fetch(url, config);
+                console.log('响应状态:', response.status);
+                console.log('响应头:', response.headers);
+                
+                const data = await response.json();
+                console.log('响应数据:', data);
+                
+                return { success: response.ok, status: response.status, data };
+            } catch (error) {
+                console.error('请求失败:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testCORS() {
+            const result = document.getElementById('cors-result');
+            result.textContent = '测试中...';
+            
+            try {
+                const response = await makeRequest('/groups/stats');
+                if (response.success) {
+                    result.className = 'result success';
+                    result.textContent = `CORS测试成功！\n状态码: ${response.status}\n数据: ${JSON.stringify(response.data, null, 2)}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `CORS测试失败！\n错误: ${response.error || '未知错误'}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `CORS测试失败！\n错误: ${error.message}`;
+            }
+        }
+        
+        async function testGroupStats() {
+            const result = document.getElementById('stats-result');
+            result.textContent = '获取中...';
+            
+            const response = await makeRequest('/groups/stats');
+            if (response.success) {
+                result.className = 'result success';
+                result.textContent = `群组统计获取成功！\n${JSON.stringify(response.data, null, 2)}`;
+            } else {
+                result.className = 'result error';
+                result.textContent = `群组统计获取失败！\n错误: ${response.error || '未知错误'}`;
+            }
+        }
+        
+        async function testGroupList() {
+            const result = document.getElementById('list-result');
+            result.textContent = '获取中...';
+            
+            const response = await makeRequest('/groups/list?page=1&pageSize=5');
+            if (response.success) {
+                result.className = 'result success';
+                result.textContent = `群组列表获取成功！\n${JSON.stringify(response.data, null, 2)}`;
+            } else {
+                result.className = 'result error';
+                result.textContent = `群组列表获取失败！\n错误: ${response.error || '未知错误'}`;
+            }
+        }
+        
+        async function testGroupInfo() {
+            const result = document.getElementById('info-result');
+            const groupId = document.getElementById('groupId').value;
+            result.textContent = '获取中...';
+            
+            const response = await makeRequest(`/groups/info/${groupId}`);
+            if (response.success) {
+                result.className = 'result success';
+                result.textContent = `群组详情获取成功！\n${JSON.stringify(response.data, null, 2)}`;
+            } else {
+                result.className = 'result error';
+                result.textContent = `群组详情获取失败！\n错误: ${response.error || '未知错误'}`;
+            }
+        }
+        
+        async function testUpdateGroup() {
+            const result = document.getElementById('update-result');
+            const groupId = document.getElementById('updateGroupId').value;
+            const groupName = document.getElementById('groupName').value;
+            result.textContent = '更新中...';
+            
+            const response = await makeRequest(`/groups/name/${groupId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ groupName: groupName })
+            });
+            
+            if (response.success) {
+                result.className = 'result success';
+                result.textContent = `群组更新成功！\n${JSON.stringify(response.data, null, 2)}`;
+            } else {
+                result.className = 'result error';
+                result.textContent = `群组更新失败！\n错误: ${response.error || '未知错误'}`;
+            }
+        }
+    </script>
+</body>
+</html>
+

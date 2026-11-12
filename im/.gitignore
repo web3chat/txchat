@@ -1,0 +1,25 @@
+.idea/
+target/
+run_compose
+target_*
+.DS_Store
+
+# 本地预置 Presence / 集群变量（见 script/compose/key.example）
+script/compose/key
+
+
+# macOS AppleDouble / metadata
+._*
+**/._*
+
+# binaries & archives
+*.zip
+*.tar.gz
+*.tgz
+
+# frontend / local runtime
+**/node_modules/
+**/dist/
+*.log
+*.pid
+.env.local

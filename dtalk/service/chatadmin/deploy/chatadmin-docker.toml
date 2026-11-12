@@ -1,0 +1,53 @@
+# chatadmin 独立部署配置
+# ${VAR} 在启动时替换成 docker compose 注入的环境变量，默认值见 .env.example
+
+Env = "${DTALKENV}"
+
+[HttpServer]
+Addr = "0.0.0.0:18020"
+
+[MySQL]
+Host = "${MYSQL_HOST}"
+Port = ${MYSQL_PORT}
+User = "${MYSQL_USER}"
+Pwd = "${MYSQL_PWD}"
+Db = "${MYSQL_DB}"
+
+[MySQLRecord]
+Host = "${MYSQL_RECORD_HOST}"
+Port = ${MYSQL_RECORD_PORT}
+User = "${MYSQL_RECORD_USER}"
+Pwd = "${MYSQL_RECORD_PWD}"
+Db = "${MYSQL_RECORD_DB}"
+
+# 可选：user_bindings 在独立库时再打开，并在 compose 里补上对应环境变量。
+# [MySQLAuthKey]
+# Host = "${MYSQL_HOST}"
+# Port = ${MYSQL_PORT}
+# User = "${MYSQL_USER}"
+# Pwd = "${MYSQL_PWD}"
+# Db = "authkey"
+
+[Redis]
+Network = "tcp"
+Addr = "${REDIS_ADDR}"
+Auth = "${REDIS_AUTH}"
+Active = 60000
+Idle = 1024
+DialTimeout = "200ms"
+ReadTimeout = "500ms"
+WriteTimeout = "500ms"
+IdleTimeout = "120s"
+Expire = "30m"
+
+[Auth]
+JwtSecret = "${JWT_SECRET}"
+JwtTTLSeconds = ${JWT_TTL_SECONDS}
+
+[Cors]
+AllowOrigins = [
+    "${CORS_ORIGIN}",
+    "http://127.0.0.1:18020",
+    "http://localhost:18020",
+]
+AllowCredentials = true

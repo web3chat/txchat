@@ -1,0 +1,69 @@
+# 迁移包专用：不现场编译，使用打包时 docker save 的镜像。
+# 容器内连库必须用服务名 postgres:5432。
+services:
+  postgres:
+    image: ${SQUARE_PG_IMAGE:-postgres:16-alpine}
+    container_name: txchat-square-pg
+    environment:
+      TZ: Asia/Shanghai
+      POSTGRES_USER: ${SQUARE_PG_USER:-square}
+      POSTGRES_PASSWORD: ${SQUARE_PG_PASSWORD:-square}
+      POSTGRES_DB: ${SQUARE_PG_DB:-square}
+    volumes:
+      - square-pg-data:/var/lib/postgresql/data
+    networks:
+      - txchat-components
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  square:
+    image: ${SQUARE_IMAGE}
+    container_name: txchat-square
+    environment:
+      SQUARE_ENV: ${SQUARE_ENV:-prod}
+      SQUARE_ALLOW_MOCK: ${SQUARE_ALLOW_MOCK:-false}
+      SQUARE_HTTP_ADDR: "${SQUARE_HTTP_ADDR:-:18100}"
+      SQUARE_PG_HOST: postgres
+      SQUARE_PG_PORT: "5432"
+      SQUARE_PG_USER: ${SQUARE_PG_USER:-square}
+      SQUARE_PG_PASSWORD: ${SQUARE_PG_PASSWORD:-square}
+      SQUARE_PG_DB: ${SQUARE_PG_DB:-square}
+      SQUARE_PG_SSLMODE: ${SQUARE_PG_SSLMODE:-disable}
+      SQUARE_JWT_SECRET: ${SQUARE_JWT_SECRET}
+      SQUARE_BOOTSTRAP_ADMIN_USER: ${SQUARE_BOOTSTRAP_ADMIN_USER:-}
+      SQUARE_BOOTSTRAP_ADMIN_PASSWORD: ${SQUARE_BOOTSTRAP_ADMIN_PASSWORD:-}
+      SQUARE_ADMIN_PASSWORD_RESET: ${SQUARE_ADMIN_PASSWORD_RESET:-false}
+      SQUARE_BOOTSTRAP_ADMINS: ${SQUARE_BOOTSTRAP_ADMINS:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-flash}
+      DEEPSEEK_VISION_MODEL: ${DEEPSEEK_VISION_MODEL:-deepseek-flash}
+      SQUARE_CORS: ${SQUARE_CORS:-}
+      SQUARE_OSS_URL: ${SQUARE_OSS_URL:-}
+      SQUARE_OSS_APP_ID: ${SQUARE_OSS_APP_ID:-dtalk}
+      SQUARE_OSS_PRIVKEY: ${SQUARE_OSS_PRIVKEY}
+      SQUARE_POST_TTL_DAYS: ${SQUARE_POST_TTL_DAYS:-45}
+      SQUARE_RETENTION_INTERVAL: ${SQUARE_RETENTION_INTERVAL:-1h}
+      SQUARE_OSS_DELETE: ${SQUARE_OSS_DELETE:-false}
+      SQUARE_HOT_WINDOW_DAYS: ${SQUARE_HOT_WINDOW_DAYS:-7}
+      SQUARE_SCHEMA_PATH: /app/sql/schema.sql
+      SQUARE_ADMIN_WEB: /app/web/admin
+      TZ: Asia/Shanghai
+    ports:
+      - "${SQUARE_HTTP_PUBLISH:-18100}:18100"
+    volumes:
+      - ./web/admin:/app/web/admin:ro
+    networks:
+      - txchat-components
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+networks:
+  txchat-components:
+    name: txchat-components
+    external: true
+volumes:
+  square-pg-data:

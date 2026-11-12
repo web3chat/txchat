@@ -1,0 +1,73 @@
+env = "release"
+
+[server]
+addr = "0.0.0.0:19000"
+
+[Trace]
+    ServiceName = "gateway"
+    Gen128Bit = true
+[Trace.Sampler]
+    Type = "const"
+    Param = 1.0
+[Trace.Reporter]
+    LogSpans = true
+    LocalAgentHostPort = "txchat-jaeger:6831"
+
+[AnswerRPCClient]
+    RegAddrs = "txchat-etcd:2379"
+    Schema = "dtalk"
+    SrvName = "answer"
+    Dial = "1s"
+    Timeout = "1s"
+
+[StoreRPCClient]
+    RegAddrs = "txchat-etcd:2379"
+    Schema = "dtalk"
+    SrvName = "store"
+    Dial = "1s"
+    Timeout = "1s"
+
+[GroupRPCClient]
+    RegAddrs = "txchat-etcd:2379"
+    Schema = "dtalk"
+    SrvName = "group"
+    Dial = "1s"
+    Timeout = "1s"
+
+[ChatCleanRPCClient]
+    RegAddrs = "txchat-etcd:2379"
+    Schema = "dtalk"
+    SrvName = "chatclean"
+    Dial = "1s"
+    Timeout = "1s"
+
+[[modules]]
+    Name = "wallet"
+    IsEnabled = false
+    EndPoints = ["", ""]   # changeme (1. 红包服务 http 服务地址, 2. 钱包服务 http 服务地址)
+
+[[modules]]
+    Name = "redPacket"
+    IsEnabled = false
+    EndPoints = ["", ""]   # changeme (1. 红包服务 http 服务地址, 2. 钱包服务 http 服务地址)
+
+[[modules]]
+    Name = "oa"
+    IsEnabled = false
+    EndPoints = ["http://oa-gateway:20000"]        # changeme (oa 服务地址)
+
+[[modules]]
+    Name = "shop"
+    IsEnabled = false
+    EndPoints = [""]     # changeme (链上购服务地址)
+
+[[modules]]
+    Name="live"
+    IsEnabled= false
+    EndPoints=[""]
+
+# 客服 HTTP 服务地址（gateway 会 HTTP 转发到此）；须与部署一致，本机可写 127.0.0.1，Docker 内需写容器名或服务发现地址
+CSServiceURL = "http://127.0.0.1:18030"
+
+[Revoke]
+    Expire = "86400h" #ten years (撤回消息有效时间)

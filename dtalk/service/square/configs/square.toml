@@ -1,0 +1,29 @@
+# 环境变量见 README / .env.example。本文件仅作对照，进程以环境变量为准。
+# 未设置 SQUARE_PG_HOST 时自动建库容器，使用下面的 user / password / dbname。
+
+[http]
+addr = ":18100"
+
+[postgres]
+# host 留空表示自动 Docker：容器 txchat-square-pg，映射 127.0.0.1:15432
+host = ""
+port = "15432"
+user = "square"
+password = "square"
+dbname = "square"
+sslmode = "disable"
+
+[jwt]
+# 生产必须 >= 32 字符，通过 SQUARE_JWT_SECRET 注入
+secret = "dev-square-jwt-secret-change-me-32b"
+expire = "8h"
+
+[deepseek]
+base_url = "https://api.deepseek.com"
+model = "deepseek-chat"
+timeout = "8s"
+# api_key 只放环境变量 DEEPSEEK_API_KEY
+
+[runtime]
+env = "local"
+allow_mock = true

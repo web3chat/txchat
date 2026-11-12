@@ -1,0 +1,57 @@
+# chatclean Docker 环境配置
+# 所有 ${VAR} 会在启动时被 os.ExpandEnv 替换为对应的环境变量值
+# 环境变量由 docker-compose.yml 注入，默认值见 .env.example
+
+AppId = "dtalk"
+Env   = "${DTALKENV}"
+
+[Log]
+  Level   = "${LOG_LEVEL}"
+  Mode    = "console"
+  Path    = ""
+  Display = "json"
+
+[GRPCServer]
+  Network = "tcp"
+  Addr    = ":30010"
+  Timeout = "1s"
+
+[Reg]
+  Schema       = "dtalk"
+  SrvName      = "chatclean"
+  RegAddrs     = "${REGADDRS}"
+  RegisterAddr = "${REGISTER_ADDR}"
+
+[MySQL]
+  Host     = "${MYSQL_HOST}"
+  Port     = ${MYSQL_PORT}
+  User     = "${MYSQL_USER}"
+  Pwd      = "${MYSQL_PWD}"
+  Db       = "${MYSQL_DB}"
+  RecordDb = "${MYSQL_RECORD_DB}"
+
+[Scheduler]
+  Interval  = "${SCHEDULER_INTERVAL}"
+  BatchSize = ${SCHEDULER_BATCH_SIZE}
+
+# 私聊和群聊都只保留 now-Keep。不读取按会话的自动删除配置。
+[Retention]
+  Enable     = true
+  Keep       = "168h"
+  MaxBatches = 200
+
+# 清理 record:{uid}。Auth 没设密码时留空。
+[Redis]
+  Enable = true
+  Addr   = "${REDIS_ADDR}"
+  Auth   = "${REDIS_AUTH}"
+
+# 按日期目录删对象。密钥放环境变量，不要写进仓库。
+[MinIO]
+  Enable     = true
+  Endpoint   = "${MINIO_ENDPOINT}"
+  Bucket     = "${MINIO_BUCKET}"
+  AccessKey  = "${MINIO_ACCESS_KEY}"
+  SecretKey  = "${MINIO_SECRET_KEY}"
+  UseSSL     = false
+  MaxObjects = 2000

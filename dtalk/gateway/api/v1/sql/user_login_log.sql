@@ -1,0 +1,6 @@
+-- dtalk_login_log 建在库 dtalk_record（与消息记录同库）
+-- 完整建表语句已纳入：dtalk/script/mysql/dtalk_record.sql（执行该文件会 USE dtalk_record 并创建本表）
+--
+-- 应用侧请保证：
+-- - IM Logic [loginLog].dsn 中数据库名为 dtalk_record（或与部署一致）
+-- - dtalk groupmanage 使用 MySQLRecord 连接查询本表；user_bindings 仍在 dtalk 业务库

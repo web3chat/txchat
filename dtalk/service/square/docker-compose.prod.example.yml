@@ -1,0 +1,62 @@
+# 生产示例：禁止 MOCK；JWT 与管理员密码必须用环境变量注入，不要写进仓库。
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: txchat-square-pg
+    environment:
+      TZ: Asia/Shanghai
+      POSTGRES_USER: square
+      POSTGRES_PASSWORD: ${SQUARE_PG_PASSWORD}
+      POSTGRES_DB: square
+    volumes:
+      - square-pg-data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    networks:
+      - txchat-components
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U square -d square"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  square:
+    image: txchat-square:${SQUARE_IMAGE:-latest}
+    container_name: txchat-square
+    environment:
+      SQUARE_ENV: prod
+      SQUARE_ALLOW_MOCK: "false"
+      SQUARE_HTTP_ADDR: ":18100"
+      SQUARE_PG_HOST: postgres
+      SQUARE_PG_PORT: "5432"
+      SQUARE_PG_USER: square
+      SQUARE_PG_PASSWORD: ${SQUARE_PG_PASSWORD}
+      SQUARE_PG_DB: square
+      SQUARE_JWT_SECRET: ${SQUARE_JWT_SECRET}
+      SQUARE_CORS: ${SQUARE_CORS}
+      SQUARE_BOOTSTRAP_ADMIN_USER: ${SQUARE_BOOTSTRAP_ADMIN_USER:-}
+      SQUARE_BOOTSTRAP_ADMIN_PASSWORD: ${SQUARE_BOOTSTRAP_ADMIN_PASSWORD:-}
+      SQUARE_ADMIN_PASSWORD_RESET: ${SQUARE_ADMIN_PASSWORD_RESET:-false}
+      SQUARE_BOOTSTRAP_ADMINS: ${SQUARE_BOOTSTRAP_ADMINS:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-flash}
+      DEEPSEEK_VISION_MODEL: ${DEEPSEEK_VISION_MODEL:-deepseek-flash}
+      SQUARE_OSS_URL: ${SQUARE_OSS_URL:-http://localhost:8888}
+      SQUARE_OSS_APP_ID: ${SQUARE_OSS_APP_ID:-dtalk}
+      SQUARE_OSS_PRIVKEY: ${SQUARE_OSS_PRIVKEY}
+      SQUARE_SCHEMA_PATH: /app/sql/schema.sql
+      SQUARE_ADMIN_WEB: /app/web/admin
+      TZ: Asia/Shanghai
+    ports:
+      - "18100:18100"
+    networks:
+      - txchat-components
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+networks:
+  txchat-components:
+    name: txchat-components
+    external: true
+volumes:
+  square-pg-data:

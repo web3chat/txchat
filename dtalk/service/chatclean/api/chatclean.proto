@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package dtalk.chatclean;
+
+option go_package = "github.com/web3chat/txchat/dtalk/service/chatclean/api";
+
+// 手动删除的时间范围选项
+enum DateOption {
+  CUSTOM = 0;
+  LAST_1_DAY = 1;
+  LAST_3_DAYS = 2;
+  LAST_7_DAYS = 3;
+  LAST_30_DAYS = 4;
+  LAST_90_DAYS = 5;
+  LAST_180_DAYS = 6;
+  LAST_365_DAYS = 7;
+  ALL_TIME = 8;
+}
+
+// 自动删除的保留时长选项
+enum AutoDeleteOption {
+  AUTO_NEVER = 0;
+  AUTO_1_DAY = 1;
+  AUTO_3_DAYS = 2;
+  AUTO_7_DAYS = 3;
+  AUTO_30_DAYS = 4;
+  AUTO_180_DAYS = 5;
+}
+
+message CleanPrivateChatReq {
+  string operator_id = 1;
+  string target_id = 2;
+  DateOption date_opt = 3;
+  int64 start_time = 4;  // Unix ms, 仅 CUSTOM 时有效
+  int64 end_time = 5;    // Unix ms, 仅 CUSTOM 时有效
+}
+
+message CleanPrivateChatReply {
+  int64 deleted_count = 1;
+}
+
+message SetAutoDeleteConfigReq {
+  string operator_id = 1;
+  string target_id = 2;
+  AutoDeleteOption option = 3;
+}
+
+message SetAutoDeleteConfigReply {
+  AutoDeleteOption option = 1;
+  string updated_by = 2;
+  int64 updated_at = 3;
+}
+
+message GetAutoDeleteConfigReq {
+  string operator_id = 1;
+  string target_id = 2;
+}
+
+message GetAutoDeleteConfigReply {
+  AutoDeleteOption option = 1;
+  string updated_by = 2;
+  int64 updated_at = 3;
+}
+
+service ChatClean {
+  rpc CleanPrivateChat(CleanPrivateChatReq) returns (CleanPrivateChatReply);
+  rpc SetAutoDeleteConfig(SetAutoDeleteConfigReq) returns (SetAutoDeleteConfigReply);
+  rpc GetAutoDeleteConfig(GetAutoDeleteConfigReq) returns (GetAutoDeleteConfigReply);
+}

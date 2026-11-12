@@ -1,0 +1,529 @@
+/**
+ * 全站统一风格：浅色、与仪表盘一致的青紫点缀 + Outfit 字体
+ * 加载顺序：在 style.css、dashboard-modern.css 之后
+ */
+:root {
+    --app-font: "Outfit", system-ui, -apple-system, sans-serif;
+    --app-mono: "JetBrains Mono", ui-monospace, monospace;
+    --app-page-bg: linear-gradient(165deg, #e8f4fc 0%, #f0f9ff 25%, #f1f5f9 55%, #faf5ff 100%);
+    --app-panel: #ffffff;
+    --app-panel-muted: #f8fafc;
+    --app-border: rgba(15, 23, 42, 0.07);
+    --app-border-focus: rgba(6, 182, 212, 0.45);
+    --app-shadow: 0 4px 24px rgba(15, 23, 42, 0.055);
+    --app-shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.08);
+    --app-text: #0f172a;
+    --app-text-muted: #64748b;
+    --app-cyan: #06b6d4;
+    --app-violet: #8b5cf6;
+    --app-radius: 16px;
+    --app-radius-sm: 12px;
+}
+
+body {
+    font-family: var(--app-font);
+    background: var(--app-page-bg);
+    background-attachment: fixed;
+    color: var(--app-text);
+    min-height: 100vh;
+}
+
+/* ——— 顶栏 ——— */
+.app-container .navbar {
+    background: rgba(255, 255, 255, 0.78) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--app-border);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    color: var(--app-text);
+}
+
+.app-container .nav-brand {
+    color: var(--app-text);
+    font-weight: 700;
+}
+
+.app-container .nav-brand i {
+    color: #0891b2;
+    -webkit-text-fill-color: #0891b2;
+}
+
+.app-container .nav-link {
+    color: #475569 !important;
+}
+
+.app-container .nav-link:hover {
+    background: rgba(6, 182, 212, 0.09) !important;
+    color: var(--app-text) !important;
+    transform: translateY(-1px);
+    box-shadow: none;
+}
+
+.app-container .nav-link.active {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.14), rgba(139, 92, 246, 0.1)) !important;
+    color: #0f172a !important;
+    box-shadow: 0 2px 12px rgba(6, 182, 212, 0.12);
+}
+
+.app-container .user-info {
+    background: var(--app-panel-muted);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
+}
+
+.app-container .user-info:hover {
+    background: #fff;
+    border-color: rgba(6, 182, 212, 0.25);
+}
+
+.app-container .user-info i {
+    color: var(--app-cyan);
+}
+
+/* ——— 主内容区 ——— */
+.app-container .main-content {
+    max-width: min(1280px, 96vw);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 28px 24px 48px;
+}
+
+body.whitelist-active .app-container .main-content,
+.app-container .main-content.whitelist-expanded {
+    max-width: min(1400px, 98vw);
+}
+
+/* ——— 页面标题 ——— */
+.app-container .page-header {
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.app-container .page-header h1 {
+    font-size: clamp(1.45rem, 2.8vw, 1.95rem);
+    font-weight: 700;
+    color: var(--app-text);
+    letter-spacing: -0.02em;
+}
+
+.app-container .page-header h1 i {
+    color: var(--app-cyan);
+    margin-right: 12px;
+}
+
+.app-container .page-header p {
+    color: var(--app-text-muted);
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
+
+/* ——— 通用面板（筛选、查询块） ——— */
+.app-container .filter-section,
+.app-container .search-section.app-panel,
+.app-container .search-bar.app-panel,
+.app-container .app-panel {
+    background: var(--app-panel) !important;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius) !important;
+    box-shadow: var(--app-shadow) !important;
+    padding: 20px 22px !important;
+    margin-bottom: 20px !important;
+}
+
+.app-container .app-panel h3,
+.app-container .search-section.app-panel h3,
+.app-container .search-bar.app-panel h3 {
+    color: var(--app-text) !important;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+.app-container .app-panel h3 i {
+    color: var(--app-cyan);
+    margin-right: 8px;
+}
+
+/* ——— 操作栏 ——— */
+.app-container .action-bar {
+    margin-bottom: 20px;
+}
+
+/* ——— 按钮 ——— */
+.app-container .btn-primary {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 40%, #8b5cf6 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--app-radius-sm);
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.25);
+}
+
+.app-container .btn-primary:hover {
+    box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
+    transform: translateY(-2px);
+}
+
+.app-container .btn-secondary {
+    background: var(--app-panel-muted);
+    color: #475569;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-sm);
+}
+
+.app-container .btn-secondary:hover {
+    background: #fff;
+    border-color: rgba(6, 182, 212, 0.3);
+    color: var(--app-text);
+}
+
+.app-container .btn-info {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    border-radius: var(--app-radius-sm);
+}
+
+.app-container .btn-success:hover,
+.app-container .btn-danger:hover,
+.app-container .btn-warning:hover {
+    transform: translateY(-2px);
+}
+
+.app-container .action-btn {
+    border-radius: var(--app-radius-sm);
+    background: linear-gradient(135deg, #0891b2 0%, #8b5cf6 100%);
+}
+
+/* ——— 表格 ——— */
+.app-container .table-container {
+    background: var(--app-panel);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+    overflow: hidden;
+}
+
+.app-container .data-table th {
+    background: linear-gradient(135deg, #0e7490 0%, #6366f1 100%);
+    color: #fff;
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    border: none;
+}
+
+.app-container .data-table td {
+    border-bottom: 1px solid var(--app-border);
+    color: #334155;
+}
+
+.app-container .data-table tbody tr:hover {
+    background: rgba(6, 182, 212, 0.04);
+}
+
+.app-container .address-cell code {
+    background: var(--app-panel-muted);
+    border: 1px solid var(--app-border);
+    color: #475569;
+}
+
+/* ——— 分页 ——— */
+.app-container .pagination button {
+    border-radius: 10px;
+    border: 1px solid var(--app-border);
+    background: var(--app-panel);
+    color: #0891b2;
+    font-weight: 500;
+}
+
+.app-container .pagination button:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(139, 92, 246, 0.08));
+    border-color: rgba(6, 182, 212, 0.35);
+    color: #0e7490;
+}
+
+.app-container .pagination button.active {
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+    color: #fff;
+    border-color: transparent;
+}
+
+/* ——— 表单 ——— */
+.app-container .form-input,
+.app-container .search-input,
+.app-container .filter-select {
+    border-radius: var(--app-radius-sm);
+    border: 1px solid var(--app-border);
+    background: var(--app-panel);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.app-container .form-input:focus,
+.app-container .search-input:focus,
+.app-container .filter-select:focus {
+    border-color: var(--app-cyan);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12);
+    outline: none;
+}
+
+.app-container .form-group label {
+    color: var(--app-text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* ——— 设置页 ——— */
+.app-container .settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.app-container .setting-group {
+    background: var(--app-panel);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 24px 26px;
+    box-shadow: var(--app-shadow);
+}
+
+.app-container .setting-group h3 {
+    color: var(--app-text);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.app-container .info-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--app-border);
+}
+
+.app-container .info-label {
+    color: var(--app-text-muted);
+}
+
+.app-container .info-value {
+    color: var(--app-text);
+    font-family: var(--app-mono);
+    font-size: 0.9rem;
+}
+
+/* ——— 卡片（用户查询等） ——— */
+.app-container .card {
+    background: var(--app-panel);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+    overflow: hidden;
+}
+
+.app-container .card-header {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.06), rgba(139, 92, 246, 0.05));
+    border-bottom: 1px solid var(--app-border);
+    padding: 16px 20px;
+}
+
+.app-container .card-header h3 {
+    color: var(--app-text);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.app-container .card-header h3 i {
+    color: var(--app-cyan);
+    margin-right: 8px;
+}
+
+.app-container .card-body {
+    padding: 20px;
+}
+
+.app-container .ul-no-binding {
+    color: var(--app-text-muted) !important;
+}
+
+/* ——— 模态框（位于 .app-container 内） ——— */
+.app-container .modal {
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(8px);
+}
+
+.app-container .modal-content {
+    border-radius: var(--app-radius);
+    border: 1px solid var(--app-border);
+    box-shadow: var(--app-shadow-lg);
+    overflow: hidden;
+}
+
+.app-container .modal-header {
+    background: linear-gradient(135deg, #0e7490 0%, #6366f1 100%) !important;
+    border-radius: 0 !important;
+    padding: 18px 22px !important;
+}
+
+.app-container .modal-close {
+    color: rgba(255, 255, 255, 0.9) !important;
+    opacity: 1;
+}
+
+.app-container .modal-close:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+
+.app-container .modal-body {
+    padding: 22px 24px !important;
+    background: var(--app-panel);
+}
+
+.app-container .modal-footer {
+    background: var(--app-panel-muted);
+    border-top: 1px solid var(--app-border);
+    padding: 16px 22px !important;
+}
+
+/* ——— 通知 ——— */
+.notification {
+    font-family: var(--app-font);
+}
+
+.notification-content {
+    border-radius: var(--app-radius-sm);
+    box-shadow: var(--app-shadow-lg);
+    border: 1px solid var(--app-border);
+}
+
+/* ——— 布局工具类 ——— */
+.app-flex-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.app-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.app-panel-stack {
+    margin-bottom: 20px !important;
+}
+
+.app-msg-actions {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.app-ul-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.app-ul-fg-address {
+    flex: 2;
+    min-width: 260px;
+    margin-bottom: 0 !important;
+}
+
+.app-ul-fg-time {
+    flex: 1;
+    min-width: 160px;
+    margin-bottom: 0 !important;
+}
+
+.app-ul-fg-size {
+    min-width: 100px;
+    margin-bottom: 0 !important;
+}
+
+.app-ul-toolbar .form-input {
+    width: 100%;
+}
+
+.app-ul-search-btn {
+    height: 40px;
+    white-space: nowrap;
+    align-self: flex-end;
+}
+
+.app-container #userlogin .app-ul-toolbar label {
+    font-size: 0.85rem;
+}
+
+/* 全站登录日志：完整链上地址可复制 */
+.app-container #loginlogs .ll-uid-cell {
+    font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.8rem;
+    line-height: 1.35;
+    word-break: break-all;
+    white-space: normal;
+    max-width: min(36rem, 42vw);
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.app-card-spaced {
+    margin-bottom: 20px !important;
+}
+
+.app-empty-hint {
+    text-align: center;
+    padding: 24px;
+    color: var(--app-text-muted);
+}
+
+.app-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.app-muted-caption {
+    font-size: 0.85rem;
+    color: var(--app-text-muted);
+}
+
+.app-table-empty {
+    text-align: center !important;
+    color: var(--app-text-muted) !important;
+    padding: 24px !important;
+}
+
+.app-pagination-tight {
+    margin-top: 12px;
+}
+
+/* 统计卡片（若其他页仍用） */
+.app-container .stat-card {
+    background: var(--app-panel);
+    border: 1px solid var(--app-border);
+    box-shadow: var(--app-shadow);
+    border-radius: var(--app-radius);
+}
+
+.app-container .stat-card::after {
+    background: linear-gradient(90deg, var(--app-cyan), var(--app-violet));
+}
+
+.app-container .stat-content h3 {
+    color: var(--app-text);
+    font-family: var(--app-mono);
+}
+
+.app-container .stat-content p {
+    color: var(--app-text-muted);
+}

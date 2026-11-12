@@ -1,0 +1,33 @@
+clusterId = "cluster-a"
+# 默认关闭；FEDERATION_ENABLED=true 时由 apply-federation 打开
+enabled = false
+adminHttpAddr = "0.0.0.0:18061"
+
+[GRPCServer]
+    addr = "0.0.0.0:18060"
+    timeout = "2s"
+
+[mysql]
+    host = "txchat-mysql"
+    port = "3306"
+    user = "root"
+    pwd = "${MYSQL_PASSWORD}"
+    dbName = "dtalk_record"
+
+[presence]
+    url = "http://txchat-presence:18050"
+    timeout = "2s"
+
+[logicRPC]
+    schema = "im"
+    srvName = "logic"
+    regAddrs = "txchat-etcd:2379"
+    dial = "1s"
+    timeout = "1s"
+
+[outbox]
+    maxRetry = 20
+    pollInterval = "2s"
+    rpcTimeout = "2s"
+    batchSize = 50
+    leaseDuration = "30s"

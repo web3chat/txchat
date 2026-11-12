@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    (function () {
+      var mode = "system";
+      try {
+        var saved = localStorage.getItem("square_admin_theme");
+        if (saved === "light" || saved === "dark" || saved === "system") mode = saved;
+      } catch (e) {}
+      var dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      var root = document.documentElement;
+      root.setAttribute("data-theme", mode);
+      root.setAttribute("data-resolved", dark ? "dark" : "light");
+      root.style.colorScheme = dark ? "dark" : "light";
+    })();
+  </script>
+  <title>谈信广场 · 运营台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect rx='8' width='32' height='32' fill='%230d9488'/%3E%3Cpath d='M8 20.5 16 9l8 11.5' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linejoin='round'/%3E%3Ccircle cx='16' cy='22' r='1.6' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css?v=same-account-warn" />
+</head>
+<body>
+  <div id="login-view" class="login-stage">
+    <aside class="login-brand">
+      <div class="login-brand-inner">
+        <div class="brand-mark" aria-hidden="true">广</div>
+        <p class="eyebrow">Square Console</p>
+        <h1>谈信广场运营台</h1>
+        <p class="lead">审核公众号、处理 AI 队列、管理帖评与审计记录。与谈信管理后台同一套专业运营体验。</p>
+        <ul class="login-points">
+          <li>公众号一地址一号，审后以号名发帖</li>
+          <li>DeepSeek 机审 + 人工覆盖</li>
+          <li>操作全程审计，验证码登录</li>
+        </ul>
+      </div>
+    </aside>
+    <section class="login-panel">
+      <form id="login-form" class="login-card" autocomplete="on">
+        <div class="login-card-top">
+          <p class="eyebrow">管理员登录</p>
+          <div class="theme-switch" role="group" aria-label="外观">
+            <button type="button" data-theme-choice="system" title="跟随系统" aria-label="跟随系统"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button type="button" data-theme-choice="light" title="浅色" aria-label="浅色"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button type="button" data-theme-choice="dark" title="深色" aria-label="深色"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.8A8.2 8.2 0 1 0 20.2 14 6.4 6.4 0 0 1 15.5 3.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+        <h2>欢迎回来</h2>
+        <p class="muted">使用运营账号进入广场管理台</p>
+        <label class="field">用户名
+          <input id="username" autocomplete="username" required placeholder="请输入用户名" />
+        </label>
+        <label class="field">密码
+          <input id="password" type="password" autocomplete="current-password" required placeholder="请输入密码" />
+        </label>
+        <label class="field">验证码
+          <div class="captcha-row">
+            <input id="captcha" maxlength="8" required placeholder="点击图片可刷新" />
+            <img id="captcha-img" alt="验证码" title="点击刷新" />
+          </div>
+        </label>
+        <p id="login-err" class="err" role="alert"></p>
+        <button type="submit" class="btn-primary btn-block" id="login-btn">进入运营台</button>
+      </form>
+    </section>
+  </div>
+
+  <div id="app-view" class="app-shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">广</div>
+        <div class="brand-copy">
+          <div class="brand-name">谈信广场</div>
+          <div class="brand-sub">Operations</div>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="主导航">
+        <div class="nav-group">
+          <p class="nav-label">总览</p>
+          <button type="button" data-tab="overview">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="13.5" y="3.5" width="7" height="16.5" rx="1.4"/><rect x="3.5" y="13.5" width="7" height="6.5" rx="1.4"/></svg>
+            工作台
+          </button>
+          <button type="button" data-tab="trends">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16"/><path d="M5 15l4.2-5.2 3.2 3.4L19 7"/></svg>
+            广场趋势
+          </button>
+          <button type="button" data-tab="authors">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19V11"/><path d="M12 19V5"/><path d="M18 19v-6"/></svg>
+            发帖人排行
+          </button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-label">公众号</p>
+          <button type="button" data-tab="applies">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V5.6A1.6 1.6 0 0 1 9.6 4h4.8A1.6 1.6 0 0 1 16 5.6V7"/><rect x="6" y="7" width="12" height="13" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+            入驻申请
+            <span class="nav-count hidden" data-nav-count="applies"></span>
+          </button>
+          <button type="button" data-tab="officials">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19.5c.7-3.1 3.3-5 6.5-5s5.8 1.9 6.5 5"/></svg>
+            公众号账号
+          </button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-label">内容</p>
+          <button type="button" data-tab="compose">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 20.5H21"/><path d="M16.6 4.4a2 2 0 0 1 2.8 2.8L8 18.6 4 19.8l1.2-4z"/></svg>
+            官方发帖
+          </button>
+          <button type="button" data-tab="officialReplies">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14v8H8.5L5 17.5V6.5z"/><path d="M9 10h6"/></svg>
+            官方帖回复
+            <span class="nav-count hidden" data-nav-count="officialReplies"></span>
+          </button>
+          <button type="button" data-tab="posts">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h7.5L19.5 9v10.5H7A1.5 1.5 0 0 1 5.5 18V6A1.5 1.5 0 0 1 7 4.5z"/><path d="M14.5 4.5V9h4.5"/></svg>
+            帖子队列
+            <span class="nav-count hidden" data-nav-count="posts"></span>
+          </button>
+          <button type="button" data-tab="comments">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5h14v9.5H8.2L5 18.2V5.5z"/><path d="M8.5 9h7M8.5 12.5h5"/></svg>
+            评论队列
+            <span class="nav-count hidden" data-nav-count="comments"></span>
+          </button>
+        </div>
+        <div class="nav-group">
+          <p class="nav-label">合规</p>
+          <button type="button" data-tab="reports">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h12l-1.6 7H7.6L6 4.5z"/><path d="M8 11.5v8h8v-8"/></svg>
+            举报
+            <span class="nav-count hidden" data-nav-count="reports"></span>
+          </button>
+          <button type="button" data-tab="accounts">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.2"/><path d="M14.6 14.6 19.5 19.5"/></svg>
+            账户查询
+          </button>
+          <button type="button" data-tab="bans">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M6.4 6.4l11.2 11.2"/></svg>
+            用户封禁
+          </button>
+          <button type="button" data-tab="audits">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11M8 12h11M8 17h7"/><path d="M5 7h.01M5 12h.01M5 17h.01"/></svg>
+            操作审计
+          </button>
+          <button type="button" data-tab="staff" id="nav-staff" class="hidden">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.6"/><circle cx="16" cy="9" r="2.1"/><path d="M4.8 18.5c.5-2.4 2.4-3.8 4.2-3.8s3.7 1.4 4.2 3.8"/><path d="M14 14.8c1.5-.2 3 .8 3.6 2.7"/></svg>
+            运营账号
+          </button>
+          <button type="button" data-tab="settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H8a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V8c.3.6.9 1 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+            广场设置
+          </button>
+        </div>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="user-chip">
+          <span class="avatar" id="avatar">A</span>
+          <span class="user-meta">
+            <strong id="who-name">—</strong>
+            <small id="who-role">—</small>
+          </span>
+          <button type="button" class="sidebar-logout" id="logout-side" title="退出登录" aria-label="退出登录">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 20.5H6A1.5 1.5 0 0 1 4.5 19V5A1.5 1.5 0 0 1 6 3.5h3"/><path d="M15 16.5 19.5 12 15 7.5"/><path d="M19.5 12H9"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <button type="button" class="icon-btn menu-toggle" id="menu-toggle" aria-label="打开菜单">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="page-head">
+        <h1 id="page-title">工作台</h1>
+        <p id="page-desc">今日指标与审核队列</p>
+      </div>
+      <div class="topbar-actions">
+        <div class="inbox" id="inbox">
+          <button type="button" class="icon-btn inbox-btn" id="inbox-btn" aria-label="待办通知" aria-expanded="false" aria-haspopup="dialog" title="待办通知">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 9.2a5.8 5.8 0 0 1 11.6 0c0 4.2 1.3 5.6 1.8 6.2H4.4c.5-.6 1.8-2 1.8-6.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 18.2a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span class="inbox-badge hidden" id="inbox-badge">0</span>
+          </button>
+          <div class="inbox-panel hidden" id="inbox-panel" role="dialog" aria-label="待办通知">
+            <div class="inbox-head">
+              <strong>待办通知</strong>
+              <label class="inbox-mute"><input type="checkbox" id="inbox-pop-toggle" checked /> 弹窗提醒</label>
+            </div>
+            <div id="inbox-list"></div>
+          </div>
+        </div>
+        <div class="theme-switch" role="group" aria-label="外观">
+          <button type="button" data-theme-choice="system" title="跟随系统" aria-label="跟随系统"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20h8M12 16v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button type="button" data-theme-choice="light" title="浅色" aria-label="浅色"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button type="button" data-theme-choice="dark" title="深色" aria-label="深色"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.8A8.2 8.2 0 1 0 20.2 14 6.4 6.4 0 0 1 15.5 3.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+        </div>
+        <label class="auto-refresh" title="按间隔刷新当前页，弹窗打开时会暂停">
+          <input type="checkbox" id="auto-refresh" />
+          自动刷新
+        </label>
+        <select id="auto-refresh-sec" aria-label="刷新间隔">
+          <option value="15">15 秒</option>
+          <option value="30" selected>30 秒</option>
+          <option value="60">60 秒</option>
+        </select>
+        <span id="refresh-hint" class="muted">—</span>
+        <button type="button" class="btn-ghost" id="refresh-btn">
+          <svg class="refresh-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-13.6 5.7L4 16M4 20v-4h4M4 12a8 8 0 0 1 13.6-5.7L20 8M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="refresh-btn-label">刷新</span>
+        </button>
+        <button type="button" class="btn-ghost" id="logout">退出</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section id="tab-overview" class="tab">
+        <div id="square-gate-banner" class="gate-banner hidden"></div>
+        <div class="stat-grid metrics" id="metric-grid"></div>
+        <div class="stat-grid" id="stat-grid"></div>
+        <div class="split">
+          <article class="panel">
+            <header class="panel-head">
+              <h2>待审入驻</h2>
+              <button type="button" class="link-btn" data-tab="applies">查看全部</button>
+            </header>
+            <div id="overview-applies" class="mini-list"></div>
+          </article>
+          <article class="panel">
+            <header class="panel-head">
+              <h2>帖子 AI 队列</h2>
+              <button type="button" class="link-btn" data-tab="posts">查看全部</button>
+            </header>
+            <div id="overview-posts" class="mini-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-trends" class="tab hidden">
+        <div class="trend-kpis" id="trend-kpis"></div>
+        <article class="trend-card">
+          <header class="trend-head">
+            <div>
+              <p class="trend-kicker">全站</p>
+              <h2>近 <span id="chart-days-label">14</span> 日广场脉搏</h2>
+            </div>
+            <div class="trend-head-actions">
+              <div class="chart-switch" id="chart-mode">
+                <button type="button" class="on" data-chart-mode="line">趋势</button>
+                <button type="button" data-chart-mode="area">面积</button>
+                <button type="button" data-chart-mode="bar">柱状</button>
+                <button type="button" data-chart-mode="stack">堆叠</button>
+                <button type="button" data-chart-mode="share">占比</button>
+              </div>
+              <div class="chips" id="chart-range">
+                <button type="button" class="chip-btn" data-days="7">7 日</button>
+                <button type="button" class="chip-btn on" data-days="14">14 日</button>
+                <button type="button" class="chip-btn" data-days="30">30 日</button>
+              </div>
+            </div>
+          </header>
+          <div id="trend-legend" class="chart-legend"></div>
+          <div class="chart-stage" id="trend-stage">
+            <div id="trend-chart" class="chart-canvas"></div>
+            <div class="chart-tip hidden" id="trend-tip"></div>
+          </div>
+          <p class="chart-hint" id="chart-hint">折线：发帖 / 评论 / 点赞用左轴，浏览用右轴。浏览量为独立用户当日首次打开详情；帖评不含已删除。</p>
+        </article>
+        <article class="trend-card">
+          <header class="trend-head">
+            <div>
+              <p class="trend-kicker">按人</p>
+              <h2>地址发帖量</h2>
+            </div>
+          </header>
+          <div class="trend-search">
+            <input id="trend-addr" placeholder="粘贴钱包地址，多个用逗号分隔" />
+            <button type="button" class="btn-primary" id="trend-addr-btn">查询</button>
+          </div>
+          <p id="author-trend-meta" class="chart-hint">查某个用户近几日发了多少帖</p>
+          <div class="chart-stage" id="author-stage">
+            <div id="author-trend-chart" class="chart-canvas"></div>
+            <div class="chart-tip hidden" id="author-tip"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="tab-authors" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar filters">
+            <div class="filter-row chips-line">
+              <div class="filter-group">
+                <span class="filter-k">排名</span>
+                <div class="chips" id="author-rank-order">
+                  <button type="button" class="chip tone-ok on" data-author-order="likes">点赞最多</button>
+                  <button type="button" class="chip tone-info" data-author-order="views">阅读最多</button>
+                </div>
+              </div>
+              <i class="filter-split" aria-hidden="true"></i>
+              <div class="filter-group">
+                <span class="filter-k">区间</span>
+                <div class="chips" id="author-rank-window">
+                  <button type="button" class="chip tone-info" data-author-window="today">当日</button>
+                  <button type="button" class="chip tone-ok on" data-author-window="week">近一周</button>
+                  <button type="button" class="chip tone-warn" data-author-window="month">近一个月</button>
+                </div>
+              </div>
+            </div>
+            <div class="filter-row search-line">
+              <input id="author-rank-addr" class="filter-input" placeholder="作者地址，可多值" />
+              <input id="author-rank-name" class="filter-input" placeholder="昵称模糊，可多值" />
+              <div class="filter-actions">
+                <button type="button" class="btn-primary" data-reload="authors">查询</button>
+              </div>
+            </div>
+          </div>
+          <p class="hint">按窗口内发帖累计点赞或阅读量排序，不含草稿与已删。点领奖台或「看帖」可跳到该作者的帖子。</p>
+          <div class="podium hidden" id="author-podium" aria-label="前三名领奖台"></div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>排名</th><th>作者</th><th>类型</th><th>发帖</th><th>点赞</th><th>阅读</th><th>评论</th><th>操作</th>
+            </tr></thead>
+            <tbody id="authors-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="authors"></div>
+        </div>
+      </section>
+
+      <section id="tab-applies" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar">
+            <div class="chips" data-filter="applies">
+              <label class="chip"><input type="checkbox" class="st" value="pending" checked /> 待审核</label>
+              <label class="chip"><input type="checkbox" class="st" value="approved" /> 已通过</label>
+              <label class="chip"><input type="checkbox" class="st" value="rejected" /> 已拒绝</label>
+            </div>
+            <button type="button" class="btn-primary" data-reload="applies">查询</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>ID</th><th>申请人</th><th>公众号名称</th><th>简介</th><th>申请时间</th><th>审批时间</th><th>状态</th><th>操作</th>
+            </tr></thead>
+            <tbody id="applies-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="applies"></div>
+        </div>
+      </section>
+
+      <section id="tab-officials" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar filters">
+            <div class="filter-row chips-line">
+              <div class="filter-group">
+                <span class="filter-k">状态</span>
+                <div class="chips" data-filter="officials">
+                  <label class="chip tone-ok"><input type="checkbox" class="st" value="1" checked /> 正常</label>
+                  <label class="chip tone-danger"><input type="checkbox" class="st" value="2" /> 已封禁</label>
+                </div>
+              </div>
+              <i class="filter-split" aria-hidden="true"></i>
+              <div class="filter-group">
+                <span class="filter-k">金标</span>
+                <div class="chips">
+                  <label class="chip tone-gold"><input type="checkbox" class="gd-oa" value="1" /> 金标</label>
+                </div>
+              </div>
+              <div class="filter-group">
+                <span class="filter-k">排序</span>
+                <select id="official-order" class="filter-select" title="排序">
+                  <option value="" selected>入驻时间</option>
+                  <option value="followers">粉丝最多</option>
+                  <option value="posts">发帖最多</option>
+                  <option value="reports">投诉最多</option>
+                </select>
+              </div>
+              <div class="filter-actions">
+                <button type="button" class="btn-primary" data-reload="officials">查询</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>钱包地址</th><th>名称</th><th>发帖</th><th>粉丝</th><th title="该号所发帖子被举报的次数">投诉</th><th class="col-flag">状态</th><th class="col-flag">金标</th><th>封禁原因</th><th>操作</th>
+            </tr></thead>
+            <tbody id="officials-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="officials"></div>
+        </div>
+      </section>
+
+      <section id="tab-compose" class="tab hidden">
+        <form id="compose-form" class="compose-layout">
+          <div class="compose-editor">
+            <div class="compose-paper">
+              <header class="compose-mast">
+                <div class="compose-profile">
+                  <div class="compose-mast-main">
+                    <div class="identity-row" id="compose-names" role="radiogroup" aria-label="发布身份" title="点头像切换身份。点编辑后才能改名称、简介和头像。"></div>
+                    <div class="identity-now-col">
+                      <div id="compose-current" class="identity-now" aria-live="polite">
+                        <span class="identity-now-k">当前身份</span>
+                        <div class="identity-now-line">
+                          <strong id="compose-current-name">未选择</strong>
+                          <button type="button" class="identity-now-edit" id="compose-identity-edit">编辑</button>
+                        </div>
+                      </div>
+                      <p id="compose-current-intro" class="identity-now-intro"></p>
+                    </div>
+                  </div>
+                  <input type="file" id="compose-avatar-file" class="sr-file" accept="image/jpeg,image/png,image/gif,image/webp" />
+                  <input type="hidden" id="compose-avatar" />
+                  <div id="compose-identity-editor" class="identity-editor hidden">
+                    <label class="field compose-name-add" id="compose-name-label">名称
+                      <input id="compose-name" maxlength="32" placeholder="这个身份叫什么" />
+                    </label>
+                    <label class="field">简介
+                      <textarea id="compose-persona-intro" maxlength="200" rows="3" placeholder="用一两句话介绍这个身份"></textarea>
+                    </label>
+                    <div class="identity-actions">
+                      <button type="button" class="btn-primary" id="compose-name-save">保存</button>
+                      <button type="button" class="btn-ghost" id="compose-name-cancel">取消</button>
+                      <button type="button" class="btn-ghost" id="compose-name-delete">删除</button>
+                    </div>
+                    <p id="compose-name-status" class="muted compose-name-status"></p>
+                  </div>
+                </div>
+                <div class="identity-library">
+                  <button type="button" class="link-btn" id="compose-draft-new">写新稿</button>
+                  <div class="identity-library-nav">
+                    <button type="button" class="library-entry" id="compose-open-drafts">
+                      <em>草稿箱</em>
+                      <strong id="compose-drafts-count">0 篇</strong>
+                    </button>
+                    <button type="button" class="library-entry" id="compose-open-published">
+                      <em>已发布</em>
+                      <strong id="compose-published-count">0 篇</strong>
+                    </button>
+                  </div>
+                </div>
+              </header>
+              <div class="compose-sheet">
+                <p id="compose-hint" class="compose-status muted"></p>
+                <label class="compose-title-field">
+                  <span class="compose-field-k">标题</span>
+                  <input id="compose-title" maxlength="64" placeholder="请输入标题" />
+                </label>
+                <label class="compose-abstract">
+                  <span class="compose-field-head">
+                    <span class="compose-field-k">摘要</span>
+                    <em>选填，列表和分享时展示</em>
+                    <b id="compose-intro-count">0 / 200</b>
+                  </span>
+                  <textarea id="compose-intro" rows="2" maxlength="200" placeholder="用一两句话说明这篇帖子"></textarea>
+                </label>
+                <div class="compose-tag-row">
+                  <span class="compose-field-k">标签</span>
+                  <input type="hidden" id="compose-tag" value="消息" />
+                  <div class="chips compose-tag-chips" id="compose-tag-chips">
+                    <button type="button" class="chip" data-tag="">不分类</button>
+                    <button type="button" class="chip tone-info" data-tag="公告">公告</button>
+                    <button type="button" class="chip tone-ok on" data-tag="消息">消息</button>
+                    <button type="button" class="chip tone-warn" data-tag="活动">活动</button>
+                  </div>
+                </div>
+                <div class="compose-md">
+                  <div class="compose-md-bar">
+                    <div class="compose-md-tabs" role="tablist" aria-label="编辑方式">
+                      <button type="button" id="compose-md-write" class="on" role="tab" aria-selected="true">撰写</button>
+                      <button type="button" id="compose-md-toggle" role="tab" aria-selected="false">预览</button>
+                    </div>
+                    <span class="compose-md-tools">
+                      <button type="button" data-md="bold" title="粗体">B</button>
+                      <button type="button" data-md="italic" title="斜体">I</button>
+                      <button type="button" data-md="h2" title="二级标题">H</button>
+                      <button type="button" data-md="ul" title="列表">•</button>
+                      <button type="button" data-md="quote" title="引用">“</button>
+                      <button type="button" data-md="code" title="代码">&lt;/&gt;</button>
+                      <button type="button" data-md="link" title="链接">链</button>
+                    </span>
+                  </div>
+                  <div class="compose-md-canvas">
+                    <textarea id="compose-content" rows="6" maxlength="5000" placeholder="用 Markdown 写正文。图片请加在下方配图。"></textarea>
+                    <div id="compose-md-preview" class="compose-md-preview post-md hidden"></div>
+                    <span class="compose-count" id="compose-count">0 / 5000</span>
+                  </div>
+                </div>
+                <div class="compose-media" id="compose-drop">
+                  <div class="compose-media-top">
+                    <span class="compose-field-k">配图</span>
+                    <p class="muted" id="compose-media-hint">最多 9 张，单张 2MB</p>
+                  </div>
+                  <div class="compose-thumbs" id="compose-thumbs">
+                    <div class="compose-add" id="compose-add" title="添加图片">
+                      <input type="file" id="compose-pick" accept="image/jpeg,image/png,image/gif,image/webp" multiple />
+                      <span class="compose-add-mark" aria-hidden="true">+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="compose-dock">
+                <section class="compose-plan" aria-label="发布计划">
+                  <div class="plan-row" id="compose-publish-wrap">
+                    <div class="plan-label">上线</div>
+                    <div class="plan-main">
+                      <div class="plan-modes" id="compose-publish-mode" role="radiogroup" aria-label="上线方式">
+                        <button type="button" class="plan-mode on" data-publish-mode="now" role="radio" aria-checked="true">立即</button>
+                        <button type="button" class="plan-mode" data-publish-mode="later" role="radio" aria-checked="false">定时</button>
+                      </div>
+                      <p class="plan-note" id="compose-publish-note">立即出现在广场。</p>
+                      <div class="plan-extra hidden" id="compose-publish-when">
+                        <input id="compose-publish-at" type="datetime-local" aria-label="发布时间" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="plan-row">
+                    <div class="plan-label">下线</div>
+                    <div class="plan-main">
+                      <div class="plan-modes" id="compose-expire-modes" role="radiogroup" aria-label="自动删除">
+                        <button type="button" class="plan-mode on" data-expire="0" role="radio" aria-checked="true">保留</button>
+                        <button type="button" class="plan-mode" data-expire="43200" role="radio" aria-checked="false">12 小时</button>
+                        <button type="button" class="plan-mode" data-expire="86400" role="radio" aria-checked="false">1 天</button>
+                        <button type="button" class="plan-mode" data-expire="604800" role="radio" aria-checked="false">1 周</button>
+                        <button type="button" class="plan-mode" data-expire="custom" role="radio" aria-checked="false">自定义</button>
+                      </div>
+                      <p class="plan-note" id="compose-schedule-hint">一直留在广场，直到手动删除。</p>
+                      <label class="plan-extra hidden" id="compose-expire-custom-wrap">
+                        <input id="compose-expire-hours" type="number" min="1" max="720" step="1" inputmode="numeric" aria-label="自定义小时" placeholder="小时" />
+                        <span>小时，1–720</span>
+                      </label>
+                      <select id="compose-expire" class="plan-proxy" tabindex="-1" aria-hidden="true">
+                        <option value="0" selected>保留</option>
+                        <option value="43200">12 小时</option>
+                        <option value="86400">1 天</option>
+                        <option value="604800">1 周</option>
+                        <option value="custom">自定义</option>
+                      </select>
+                    </div>
+                  </div>
+                </section>
+                <div class="compose-actions">
+                  <label class="check compose-comments">
+                    <input type="checkbox" id="compose-comments" checked /> 允许评论
+                  </label>
+                  <button type="button" class="btn-ghost" id="compose-draft-btn">保存草稿</button>
+                  <button type="submit" class="btn-primary" id="compose-btn">发布官方帖</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <section id="compose-library" class="compose-library hidden">
+          <header class="library-head">
+            <button type="button" class="link-btn library-back" id="compose-library-back">返回发帖</button>
+            <div class="library-toolbar">
+              <div class="library-identity">
+                <div class="library-identity-face" id="compose-library-avatar" aria-hidden="true"></div>
+                <div class="library-head-text">
+                  <p class="compose-kicker" id="compose-library-kicker">草稿箱</p>
+                  <h2 id="compose-library-title">当前身份</h2>
+                  <p class="library-identity-intro muted" id="compose-library-intro"></p>
+                </div>
+              </div>
+              <div class="library-toolbar-side">
+                <div class="library-switch" id="compose-library-switch" role="tablist">
+                  <button type="button" data-lib="drafts" role="tab">草稿</button>
+                  <button type="button" data-lib="published" role="tab">已发布</button>
+                </div>
+                <button type="button" class="btn-primary" id="compose-library-new">写新稿</button>
+              </div>
+            </div>
+          </header>
+          <ul id="compose-drafts-list" class="library-list"></ul>
+          <ul id="compose-published-list" class="library-list hidden"></ul>
+        </section>
+      </section>
+
+      <section id="tab-officialReplies" class="tab hidden">
+        <div class="panel">
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>帖子</th><th>用户回复</th><th>最近一条</th><th>时间</th><th>状态</th><th></th>
+            </tr></thead>
+            <tbody id="official-replies-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="officialReplies"></div>
+        </div>
+      </section>
+
+      <section id="tab-posts" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar filters">
+            <div class="filter-row chips-line">
+              <div class="filter-group">
+                <span class="filter-k">状态</span>
+                <div class="chips" id="post-status-chips">
+                  <label class="chip tone-info"><input type="checkbox" class="st-post" value="5" checked /> 待审核</label>
+                  <label class="chip tone-danger"><input type="checkbox" class="st-post" value="4" checked /> 拒审</label>
+                  <label class="chip tone-ok"><input type="checkbox" class="st-post" value="1" /> 可见</label>
+                  <label class="chip tone-warn"><input type="checkbox" class="st-post" value="2" /> 隐藏</label>
+                  <label class="chip tone-muted"><input type="checkbox" class="st-post" value="3" /> 已删</label>
+                  <label class="chip tone-draft"><input type="checkbox" class="st-post" value="6" /> 草稿</label>
+                </div>
+              </div>
+              <i class="filter-split" aria-hidden="true"></i>
+              <div class="filter-group">
+                <span class="filter-k">机审</span>
+                <div class="chips" id="post-verdict-chips">
+                  <label class="chip tone-danger"><input type="checkbox" class="vd-post" value="reject" /> 拒绝</label>
+                  <label class="chip tone-warn"><input type="checkbox" class="vd-post" value="review" /> 复核</label>
+                  <label class="chip tone-ok"><input type="checkbox" class="vd-post" value="pass" /> 通过</label>
+                </div>
+              </div>
+              <i class="filter-split" aria-hidden="true"></i>
+              <div class="filter-group">
+                <span class="filter-k">金标</span>
+                <div class="chips" id="post-gold-chips">
+                  <label class="chip tone-gold"><input type="checkbox" class="gd-post" value="1" /> 金标</label>
+                </div>
+              </div>
+              <i class="filter-split" aria-hidden="true"></i>
+              <div class="filter-group">
+                <span class="filter-k">标签</span>
+                <div class="chips" id="post-tag-chips">
+                  <label class="chip tone-info"><input type="checkbox" class="tg-post" value="公告" /> 公告</label>
+                  <label class="chip tone-ok"><input type="checkbox" class="tg-post" value="消息" /> 消息</label>
+                  <label class="chip tone-warn"><input type="checkbox" class="tg-post" value="活动" /> 活动</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-row search-line">
+              <input id="post-addr" class="filter-input" placeholder="作者地址" />
+              <input id="post-name" class="filter-input" placeholder="作者昵称" />
+              <select id="post-order" class="filter-select" title="排序">
+                <option value="desc" selected>最新在前</option>
+                <option value="asc">最早在前</option>
+                <option value="hot">最热</option>
+                <option value="likes">点赞最多</option>
+                <option value="comments">评论最多</option>
+                <option value="followers">关注人数最多</option>
+                <option value="posts">发帖数最多</option>
+              </select>
+              <span id="post-rank-window-wrap" class="hidden">
+                <select id="post-rank-window" class="filter-select" title="统计区间">
+                  <option value="today">当日</option>
+                  <option value="week" selected>近一周</option>
+                  <option value="month">近一个月</option>
+                </select>
+              </span>
+              <div class="filter-actions">
+                <button type="button" class="btn-primary" data-reload="posts">查询</button>
+                <span id="post-pick-count" class="muted"></span>
+                <button type="button" class="btn-danger" id="post-batch-del" disabled>批量删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th class="col-pick"><input type="checkbox" id="post-pick-all" title="全选本页" /></th>
+              <th>ID</th><th>时间</th><th>作者</th><th>内容</th><th>标签</th><th>互动</th><th>状态</th><th>AI</th><th>操作</th>
+            </tr></thead>
+            <tbody id="posts-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="posts"></div>
+        </div>
+      </section>
+
+      <section id="tab-comments" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar filters">
+            <div class="filter-row chips-line">
+              <div class="filter-group">
+                <span class="filter-k">状态</span>
+                <div class="chips" id="cmt-status-chips">
+                  <label class="chip tone-info"><input type="checkbox" class="st-cmt" value="5" checked /> 待审核</label>
+                  <label class="chip tone-danger"><input type="checkbox" class="st-cmt" value="4" checked /> 拒审</label>
+                  <label class="chip tone-ok"><input type="checkbox" class="st-cmt" value="1" /> 可见</label>
+                  <label class="chip tone-warn"><input type="checkbox" class="st-cmt" value="2" /> 隐藏</label>
+                  <label class="chip tone-muted"><input type="checkbox" class="st-cmt" value="3" /> 已删</label>
+                </div>
+              </div>
+              <i class="filter-split" aria-hidden="true"></i>
+              <div class="filter-group">
+                <span class="filter-k">机审</span>
+                <div class="chips" id="cmt-verdict-chips">
+                  <label class="chip tone-danger"><input type="checkbox" class="vd-cmt" value="reject" /> 拒绝</label>
+                  <label class="chip tone-warn"><input type="checkbox" class="vd-cmt" value="review" /> 复核</label>
+                  <label class="chip tone-ok"><input type="checkbox" class="vd-cmt" value="pass" /> 通过</label>
+                </div>
+              </div>
+            </div>
+            <div class="filter-row search-line">
+              <input id="cmt-post" class="filter-input" placeholder="帖子 ID，可选" />
+              <select id="cmt-order" class="filter-select" title="时间排序">
+                <option value="desc" selected>最新在前</option>
+                <option value="asc">最早在前</option>
+              </select>
+              <div class="filter-actions">
+                <button type="button" class="btn-primary" data-reload="comments">查询</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>楼层</th><th>时间</th><th>帖子</th><th>作者</th><th>内容</th><th>状态</th><th>AI</th><th>操作</th>
+            </tr></thead>
+            <tbody id="comments-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="comments"></div>
+        </div>
+      </section>
+
+      <section id="tab-reports" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar">
+            <div class="chips" data-filter="reports">
+              <label class="chip"><input type="checkbox" class="st-report" value="0" checked /> 待处理</label>
+              <label class="chip"><input type="checkbox" class="st-report" value="1" /> 已处理</label>
+              <label class="chip"><input type="checkbox" class="st-report" value="2" /> 已驳回</label>
+            </div>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" class="rs-report" value="spam" /> 垃圾</label>
+              <label class="chip"><input type="checkbox" class="rs-report" value="porn" /> 色情</label>
+              <label class="chip"><input type="checkbox" class="rs-report" value="scam" /> 诈骗</label>
+              <label class="chip"><input type="checkbox" class="rs-report" value="abuse" /> 辱骂</label>
+              <label class="chip"><input type="checkbox" class="rs-report" value="other" /> 其他</label>
+            </div>
+            <label class="field inline">举报人
+              <input id="report-addr" placeholder="可多值，逗号分隔" />
+            </label>
+            <label class="field inline">帖子 ID
+              <input id="report-target" placeholder="可多值" />
+            </label>
+            <button type="button" class="btn-primary" data-reload="reports">查询</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>时间</th><th>举报人</th><th>原因</th><th>被举报内容</th><th>状态</th><th>操作</th>
+            </tr></thead>
+            <tbody id="reports-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="reports"></div>
+        </div>
+      </section>
+
+      <section id="tab-accounts" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar">
+            <label class="field inline">钱包地址
+              <input id="account-addr" placeholder="可多值，逗号分隔" />
+            </label>
+            <label class="field inline">昵称
+              <input id="account-name" placeholder="模糊匹配，可多值" />
+            </label>
+            <button type="button" class="btn-primary" data-reload="accounts">查询</button>
+          </div>
+          <p class="hint">不填条件时列出发过帖、被关注或已入驻的账户。点名称或地址查看详情和发帖。发帖数不含已删与草稿。</p>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>地址</th><th>名称</th><th>类型</th><th>发帖</th><th>粉丝</th><th>关注</th>
+            </tr></thead>
+            <tbody id="accounts-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="accounts"></div>
+        </div>
+      </section>
+
+      <section id="tab-bans" class="tab hidden">
+        <div class="panel">
+          <div class="ban-manual">
+            <h4>手动封禁</h4>
+            <p class="hint">填写完整钱包地址后点封禁。该用户将无法发帖、评论、点赞。</p>
+            <div class="ban-manual-row">
+              <label class="field">钱包地址
+                <input id="ban-new-addr" placeholder="粘贴钱包地址，例如 1FKxga…" autocomplete="off" />
+              </label>
+              <button type="button" class="btn-danger" id="ban-manual-btn">封禁该地址</button>
+            </div>
+          </div>
+          <div class="toolbar">
+            <p class="hint">查询<strong>已封禁</strong>名单。留空列出全部；回车或点查询。</p>
+            <span id="ban-total" class="muted">—</span>
+            <label class="field inline">钱包地址
+              <input id="ban-addr" placeholder="留空查全部，支持片段匹配" autocomplete="off" />
+            </label>
+            <label class="field inline">时间排序
+              <select id="ban-order">
+                <option value="desc" selected>最新封禁在前</option>
+                <option value="asc">最早封禁在前</option>
+              </select>
+            </label>
+            <button type="button" class="btn-primary" data-reload="bans">查询</button>
+            <button type="button" class="btn-ghost" id="ban-clear">全部封禁用户</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>钱包地址</th><th>最近昵称</th><th>原因</th><th>操作人</th><th>封禁时间</th><th>操作</th>
+            </tr></thead>
+            <tbody id="bans-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="bans"></div>
+        </div>
+      </section>
+
+      <section id="tab-settings" class="tab hidden">
+        <div class="panel">
+          <div class="settings-block">
+            <h4>广场开关</h4>
+            <p class="hint">完全关闭后 C 端拉不到帖子，返回关闭说明。半关闭时广场仍可见，仅官方号与白名单可发帖。</p>
+            <div class="chips" id="gate-mode-chips">
+              <label class="chip tone-ok"><input type="radio" name="gate-mode" value="open" checked /> 开放</label>
+              <label class="chip tone-danger"><input type="radio" name="gate-mode" value="closed" /> 完全关闭</label>
+              <label class="chip tone-warn"><input type="radio" name="gate-mode" value="limited" /> 半关闭</label>
+            </div>
+            <label class="field">关闭说明
+              <textarea id="gate-message" rows="2" maxlength="200" placeholder="广场功能已经关闭"></textarea>
+            </label>
+            <label class="check" id="allow-officials-wrap">
+              <input type="checkbox" id="allow-officials" checked /> 半关闭时允许已入驻公众号发帖
+            </label>
+          </div>
+          <div class="settings-block">
+            <h4>AI 审核强度</h4>
+            <p class="hint">默认宁松勿严，看不懂会放行。审核全部时帖子和评论拿不准都进人工队列。</p>
+            <div class="chips" id="mod-level-chips">
+              <label class="chip tone-ok"><input type="radio" name="mod-level" value="default" checked /> 默认强度</label>
+              <label class="chip tone-warn"><input type="radio" name="mod-level" value="strict" /> 审核全部（帖+评）</label>
+            </div>
+          </div>
+          <div class="settings-actions">
+            <button type="button" class="btn-primary" id="settings-save">保存设置</button>
+            <span id="settings-hint" class="muted"></span>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="ban-manual">
+            <h4>半关闭发帖白名单</h4>
+            <p class="hint">平台官方始终可发。下面勾选公众号即可加入白名单；个人地址仍可手动添加。若上方勾了「允许已入驻公众号」，则所有正常号都能发，勾选会在取消该项后生效。</p>
+            <div class="oa-allow-toolbar">
+              <input id="oa-allow-q" class="filter-input" placeholder="搜索公众号名称或地址" autocomplete="off" />
+              <span id="oa-allow-count" class="muted"></span>
+            </div>
+            <div id="oa-allow-list" class="oa-allow-list"></div>
+            <div class="ban-manual-row" style="margin-top:12px">
+              <label class="field">个人钱包地址
+                <input id="poster-new-addr" placeholder="非公众号地址，可多值" autocomplete="off" />
+              </label>
+              <label class="field">备注
+                <input id="poster-new-remark" placeholder="可选" maxlength="80" />
+              </label>
+              <button type="button" class="btn-primary" id="poster-add-btn">加入白名单</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>账号</th><th>备注</th><th>操作人</th><th>加入时间</th><th>操作</th>
+            </tr></thead>
+            <tbody id="posters-body"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <section id="tab-staff" class="tab hidden">
+        <div class="panel">
+          <h4>修改登录密码</h4>
+          <p class="hint">改的是当前登录账号，至少 12 位。忘记根管理员密码时，在服务器把 SQUARE_ADMIN_PASSWORD_RESET 设为 true，SQUARE_BOOTSTRAP_ADMIN_PASSWORD 写成新密码，重启一次后再改回 false。</p>
+          <div class="ban-manual-row">
+            <label class="field">当前密码
+              <input id="admin-pass-current" type="password" autocomplete="current-password" />
+            </label>
+            <label class="field">新密码
+              <input id="admin-pass-next" type="password" autocomplete="new-password" />
+            </label>
+            <label class="field">再输入一次
+              <input id="admin-pass-again" type="password" autocomplete="new-password" />
+            </label>
+            <button type="button" class="btn-primary" id="admin-pass-save">保存密码</button>
+          </div>
+          <p id="admin-pass-hint" class="hint"></p>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <p class="hint">根管理员 admin 始终可用，不能被停用或改权限。停用后对方当前登录会立即失效。</p>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>用户名</th><th>身份</th><th>状态</th><th>权限</th><th>操作</th>
+            </tr></thead>
+            <tbody id="staff-body"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <section id="tab-audits" class="tab hidden">
+        <div class="panel">
+          <div class="toolbar">
+            <p class="hint">管理员对申请、公众号、帖评的操作留痕，动作为中文说明</p>
+            <label class="field inline">帖子 ID
+              <input id="audit-post" placeholder="查看某个帖子的全部操作" />
+            </label>
+            <button type="button" class="btn-primary" data-reload="audits">查询</button>
+            <button type="button" class="btn-ghost" id="audit-clear">全部记录</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>时间</th><th>管理员</th><th>动作</th><th>对象</th><th>IP</th><th>详情</th>
+            </tr></thead>
+            <tbody id="audits-body"></tbody>
+          </table></div>
+          <div class="pager" data-pager="audits"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="backdrop" class="backdrop hidden"></div>
+  <dialog id="modal" class="modal">
+    <form method="dialog" id="modal-form">
+      <p id="modal-kicker" class="modal-kicker hidden"></p>
+      <h3 id="modal-title"></h3>
+      <p id="modal-body" class="muted"></p>
+      <div id="modal-extra"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="modal-cancel" value="cancel">取消</button>
+        <button type="submit" class="btn-primary" id="modal-ok">确认</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="detail-modal" class="modal modal-wide">
+    <div class="detail-head">
+      <h3 id="detail-title">帖子详情</h3>
+      <button type="button" class="btn-ghost" id="detail-close">关闭</button>
+    </div>
+    <div id="detail-body" class="detail-body"></div>
+  </dialog>
+  <dialog id="lightbox" class="lightbox" aria-label="查看图片">
+    <button type="button" class="lightbox-close" id="lightbox-close">关闭</button>
+    <button type="button" class="lightbox-nav prev" data-lb="-1" aria-label="上一张">‹</button>
+    <img id="lightbox-img" alt="帖子图片" />
+    <button type="button" class="lightbox-nav next" data-lb="1" aria-label="下一张">›</button>
+    <span id="lightbox-idx" class="lightbox-idx"></span>
+  </dialog>
+  <div id="inbox-pops" class="inbox-pops" aria-live="polite"></div>
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="compose-publish-overlay" class="compose-publish-overlay hidden" aria-hidden="true">
+    <div class="compose-publish-card">
+      <div class="compose-publish-mark" aria-hidden="true">
+        <svg class="compose-publish-ring" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="28"></circle>
+        </svg>
+        <svg class="compose-publish-check" viewBox="0 0 72 72">
+          <path d="M22 37.5 32 47.5 51 26"></path>
+        </svg>
+      </div>
+      <p class="compose-publish-title" id="compose-publish-title">正在发布</p>
+      <p class="compose-publish-sub" id="compose-publish-sub">官方帖即将出现在广场</p>
+    </div>
+  </div>
+  <script src="./app.js?v=same-account-warn"></script>
+</body>
+</html>

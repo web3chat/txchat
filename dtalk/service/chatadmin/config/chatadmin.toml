@@ -1,0 +1,54 @@
+# chatadmin 运营管理后台服务配置（compose / 容器内）
+
+Env = "debug"
+
+[HttpServer]
+Addr = "0.0.0.0:18020"
+
+[MySQL]
+Host = "txchat-mysql"
+Port = 3306
+User = "root"
+Pwd = "${MYSQL_PASSWORD}"
+Db = "dtalk"
+
+[MySQLRecord]
+Host = "txchat-mysql"
+Port = 3306
+User = "root"
+Pwd = "${MYSQL_PASSWORD}"
+Db = "dtalk_record"
+
+# 可选：user_bindings 独立库（如 authkey）。不配则与 [MySQL] 同库查询。
+# [MySQLAuthKey]
+# Host = "txchat-mysql"
+# Port = 3306
+# User = "root"
+# Pwd = "${MYSQL_PASSWORD}"
+# Db = "authkey"
+
+[Redis]
+Network = "tcp"
+Addr = "txchat-redis:6379"
+Auth = ""
+Active = 60000
+Idle = 1024
+DialTimeout = "200ms"
+ReadTimeout = "500ms"
+WriteTimeout = "500ms"
+IdleTimeout = "120s"
+Expire = "30m"
+
+[Auth]
+JwtSecret = "please-change-me-to-a-strong-random-secret"
+JwtTTLSeconds = 7200
+
+# manage-web 页面 Origin 白名单 = 浏览器地址栏里的「协议+主机+端口」（不要带路径）
+# 你打开 http://localhost:8000 → 必须包含下面这一项
+[Cors]
+AllowOrigins = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+AllowCredentials = true

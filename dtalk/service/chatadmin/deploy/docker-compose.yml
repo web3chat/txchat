@@ -1,0 +1,49 @@
+# chatadmin 独立部署。只启动本服务，不拉起整套 txchat。
+# 用法见 README.md。
+#
+#   cp .env.example .env
+#   docker compose up -d --build
+
+services:
+  chatadmin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BINARY_NAME: ${BINARY_NAME:-chatadmin}
+    image: txchat/chatadmin:standalone
+    container_name: chatadmin
+    ports:
+      - "${HTTP_HOST_PORT:-18020}:18020"
+    environment:
+      DTALKENV: ${DTALKENV:-production}
+      MYSQL_HOST: ${MYSQL_HOST:-mysql}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PWD: ${MYSQL_PWD:-}
+      MYSQL_DB: ${MYSQL_DB:-dtalk}
+      MYSQL_RECORD_HOST: ${MYSQL_RECORD_HOST:-mysql}
+      MYSQL_RECORD_PORT: ${MYSQL_RECORD_PORT:-3306}
+      MYSQL_RECORD_USER: ${MYSQL_RECORD_USER:-root}
+      MYSQL_RECORD_PWD: ${MYSQL_RECORD_PWD:-}
+      MYSQL_RECORD_DB: ${MYSQL_RECORD_DB:-dtalk_record}
+      REDIS_ADDR: ${REDIS_ADDR:-redis:6379}
+      REDIS_AUTH: ${REDIS_AUTH:-}
+      JWT_SECRET: ${JWT_SECRET:-please-change-me}
+      JWT_TTL_SECONDS: ${JWT_TTL_SECONDS:-7200}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://127.0.0.1:18020}
+    volumes:
+      - ./chatadmin-docker.toml:/app/etc/chatadmin.toml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 18020"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - chatadmin-net
+
+networks:
+  chatadmin-net:
+    driver: bridge

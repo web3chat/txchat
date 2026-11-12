@@ -1,0 +1,102 @@
+// protoc -I=. -I=$GOPATH/src --go_out=plugins=grpc:. *.proto
+syntax = "proto3";
+
+package dtalk.store;
+option go_package = "github.com/web3chat/txchat/dtalk/service/record/store";
+
+import "github.com/web3chat/txchat/imparse/proto/v1.proto";
+
+message DelRecordReq {
+    imparse.v1.Channel tp = 1;
+    int64 mid = 2;
+}
+
+message DelRecordReply {
+}
+
+message GetRecordReq {
+    imparse.v1.Channel tp = 1;
+    int64 mid = 2;
+}
+
+message GetRecordReply {
+    string mid = 1;
+    string seq = 2;
+    string senderId = 3;
+    string receiverId = 4;
+    uint32 msgType = 5;
+    string content = 6;
+    uint64 createTime = 7;
+    string source = 8;
+}
+
+message GetRecordsAfterMidReq {
+    imparse.v1.Channel tp = 1;
+    int64 mid = 2;
+    string from = 3;
+    string target = 4;
+    int64 count = 5;
+}
+
+message GetRecordsAfterMidReply {
+   repeated GetRecordReply records = 1;
+}
+
+message GetSyncRecordsAfterMidReq {
+    int64 mid = 1;
+    string uid = 2;
+    int64 count = 3;
+}
+
+message GetSyncRecordsAfterMidReply {
+   repeated bytes records = 1;
+}
+
+message AddRecordFocusReq {
+    string uid = 1;
+    int64  mid = 2;
+    uint64 time = 3;
+}
+
+message AddRecordFocusReply {
+    int32 currentNum = 1;
+}
+
+message BurnPrivateReq {
+    string operator = 1;
+    string targetId = 2;
+    int64  mid      = 3;
+}
+
+message BurnPrivateReply {
+    // 0 成功（含幂等已焚）；1 非阅后即焚；2 无权操作
+    int32  status     = 1;
+    bool   burned     = 2;
+    string senderId   = 3;
+    string receiverId = 4;
+    int64  mid        = 5;
+}
+
+message BurnGroupReq {
+    string operator = 1; // 确认者 uid
+    string targetId = 2; // 群 id，须与 content.receiver_id 一致
+    int64  mid      = 3;
+}
+
+message BurnGroupReply {
+    int32  status   = 1; // 0 成功（含幂等）；1 非 burn；2 无权（含群 id 不符）
+    bool   burned   = 2; // 本次是否删了该操作者的收行（或触发最后一人清 relation）
+    bool   last     = 3; // 本次是否为「最后一名收方」，gateway 据此单播发送者
+    string senderId = 4; // content.sender_id，last 时发发送者信令
+    int64  mid      = 5;
+}
+
+service Store {
+    rpc DelRecord(DelRecordReq) returns (DelRecordReply);
+    rpc GetRecord(GetRecordReq) returns (GetRecordReply);
+    rpc AddRecordFocus(AddRecordFocusReq) returns (AddRecordFocusReply);
+    rpc GetRecordsAfterMid(GetRecordsAfterMidReq) returns (GetRecordsAfterMidReply);
+    rpc GetSyncRecordsAfterMid(GetSyncRecordsAfterMidReq) returns (GetSyncRecordsAfterMidReply);
+    rpc BurnPrivate(BurnPrivateReq) returns (BurnPrivateReply);
+    rpc BurnGroup(BurnGroupReq) returns (BurnGroupReply);
+}

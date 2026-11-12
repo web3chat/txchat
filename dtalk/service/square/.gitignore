@@ -1,0 +1,14 @@
+target/
+dist/
+run_compose/
+*.log
+.DS_Store
+bin/
+._*
+.env
+.env.prod
+.env.*
+!.env.example
+*.exe
+*.test
+

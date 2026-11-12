@@ -1,0 +1,57 @@
+Env = "debug"
+
+[server]
+addr = "0.0.0.0:18030"
+
+[MySQL]
+Host = ""
+Port = 3306
+User = "root"
+Pwd = ""
+Db = "dtalk"
+
+JWTSecret = "cs-default-secret-change-me"
+AppId = "dtalk"
+
+# 收到 Comet ReceiveMsg 后再延迟（毫秒）回复 ReceiveMsgReply，给 Record Pusher 写 Redis 留时间，减轻对端安卓等仍显示「未读」。
+# 0 或不写=服务端默认 280。若仍偶发未读可酌情调至 350～450。cs-web 会通过登录/interface 自动使用该值。
+CometReceiveAckDelayMillis = 280
+
+# 链上绑定 IM 服务器（与 ChatPro 合约节点、NO_BALANCE_PRIVATE_KEY 一致）
+[Chain]
+RPC =  ""
+NoBalancePrivateKey = ""
+
+[Reg]
+Schema = "dtalk"
+SrvName = "cs"
+RegAddrs = "127.0.0.1:2379"
+
+[LogicRPCClient]
+RegAddrs = "127.0.0.1:2379"
+Schema = "im"
+SrvName = "logic"
+Dial = "1s"
+Timeout = "1s"
+
+# 无人值守 AI（DeepSeek）：默认仅当 cs_agent.status = 离线(0) 时启动 Worker（cs-web 登录会把状态改为在线，此时不会自动回复）。
+# 联调时可设 DebugIgnoreAgentStatus=true 忽略 DB 状态（可能与已打开的 cs-web 双连 Comet，慎用）。
+# 请勿提交真实 API Key；可用环境变量或挂载密钥文件。
+[OfflineAI]
+Enable = true
+CometURL = ""
+DeepSeekAPIKey = ""
+DeepSeekBaseURL = "https://api.deepseek.com"
+Model = "deepseek-chat"
+PollInterval = "15s"
+DebounceMillis = 650
+IntroDelayMillis = 150
+HeartbeatSec = 28
+ReconnectBackoffMax = "30s"
+DeviceName = "CS-Offline-AI"
+# 话术：可直接写多行字段，或用 *_File 指向 UTF-8 文本文件（启动时读入并覆盖内联内容）。
+BaseSystemPromptFile = "./terms/system_prompt.txt"
+PlaybookFile = "./terms/playbook.txt"
+ProactiveIntroFile = "./terms/intro.md"
+HandoffClosingFile = "./terms/handoff.txt"
+# DebugIgnoreAgentStatus = true

@@ -1,0 +1,29 @@
+build/
+.idea/
+target/
+target_*
+run_compose
+.cluster-state/
+.DS_Store
+swagger/docs
+api-v1.md
+
+# 本地预置密码 / 联邦变量（见 script/compose/key.example）
+script/compose/key
+
+
+# macOS AppleDouble / metadata
+._*
+**/._*
+
+# binaries & archives
+*.zip
+*.tar.gz
+*.tgz
+
+# frontend build / deps / runtime
+**/node_modules/
+**/dist/
+*.log
+*.pid
+.env.local

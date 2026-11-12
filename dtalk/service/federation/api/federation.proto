@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package federation;
+
+option go_package = "github.com/web3chat/txchat/dtalk/service/federation/api;federation";
+
+service Federation {
+  rpc DeliverPrivate(DeliverPrivateReq) returns (DeliverPrivateResp);
+  rpc MirrorPrivate(MirrorPrivateReq) returns (MirrorPrivateResp);
+  rpc SyncState(SyncStateReq) returns (SyncStateResp);
+  rpc DeliverGroup(DeliverGroupReq) returns (DeliverGroupResp);
+  rpc Ping(PingReq) returns (PingResp);
+}
+
+message MirrorPrivateReq {
+  string source_cluster = 1;
+  string app_id = 2;
+  string from = 3;
+  string target = 4;
+  int64 mid = 5;
+  string seq = 6;
+  string frame_type = 7;
+  bytes msg = 8;
+  string idempotency_key = 9;
+  string trace_id = 10;
+  int32 hop = 11;
+  string content_hash = 12;
+}
+
+message MirrorPrivateResp {
+  bool delivered = 1;
+  bool stored = 2;
+  bool duplicated = 3;
+  bool notify_queued = 4;
+  string message = 5;
+}
+
+message DeliverPrivateReq {
+  string source_cluster = 1;
+  string app_id = 2;
+  string from = 3;
+  string target = 4;
+  int64 mid = 5;
+  string seq = 6;
+  string frame_type = 7;
+  bytes msg = 8;
+  bool need_store = 9;
+  string idempotency_key = 10;
+  string trace_id = 11;
+  int32 hop = 12;
+}
+
+message DeliverPrivateResp {
+  bool delivered = 1;
+  bool online = 2;
+  bool stored = 3;
+  string message = 4;
+}
+
+message SyncStateReq {
+  string source_cluster = 1;
+  string app_id = 2;
+  string from = 3;
+  string target = 4;
+  int64 mid = 5;
+  string op = 6; // revoke | read | receipt
+  bytes payload = 7;
+  string idempotency_key = 8;
+  int32 hop = 9;
+}
+
+message SyncStateResp {
+  bool ok = 1;
+  string message = 2;
+}
+
+message DeliverGroupReq {
+  string source_cluster = 1;
+  string app_id = 2;
+  string from = 3;
+  string group_id = 4;
+  int64 mid = 5;
+  string frame_type = 6;
+  bytes msg = 7;
+  repeated string member_uids = 8;
+  bool need_store = 9;
+  string idempotency_key = 10;
+  int32 hop = 11;
+}
+
+message DeliverGroupResp {
+  bool delivered = 1;
+  string message = 2;
+}
+
+message PingReq {
+  string cluster_id = 1;
+}
+
+message PingResp {
+  string cluster_id = 1;
+  bool ok = 2;
+}

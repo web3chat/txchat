@@ -1,0 +1,55 @@
+# OS / editor
+.DS_Store
+._*
+**/._*
+.idea/
+.vscode/
+*.swp
+
+# 本地密钥 / 运行时目录
+.env
+.env.*
+!.env.example
+im/script/compose/key
+dtalk/script/compose/key
+run_compose/
+
+# Go 构建输出
+target/
+target_*
+dtalk/bin/
+*.exe
+*.test
+*.out
+
+# 编译产物目录（im/script/build 是源码目录，不能使用 build/ 通配）
+dtalk/gateway/api/v1/build/
+dtalk/service/*/build/
+
+# 本地二进制
+dtalk/service/chatclean/deploy/chatclean
+dtalk/service/chatadmin/deploy/chatadmin
+dtalk/service/chatadmin/deploy/chatadmin-*
+!dtalk/service/chatadmin/deploy/chatadmin-docker.toml
+dtalk/service/cs/tools/cs-tool
+dtalk/service/cs/tools/tools
+dtalk/service/record/kafka/consumer/test/mqtest
+im/dtask/cmd/cli_task
+im/dtask/cmd/dtaskSrv
+im/dtask/cmd/client/dtaskCli
+im/script/protoc/*/protoc
+im/script/protoc/*/protoc-gen-go
+im/script/protoc/*/protoc-gen-go-grpc
+dtalk/script/gen-proto/protoc*
+
+# 前端
+**/node_modules/
+**/dist/
+
+# 日志与归档
+*.log
+*.pid
+*.tar
+*.tar.gz
+*.tgz
+*.zip

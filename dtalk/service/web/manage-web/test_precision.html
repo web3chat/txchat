@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript精度问题测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .warning { background: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>JavaScript大整数精度问题测试</h1>
+    
+    <div class="test-section">
+        <h3>1. JavaScript安全整数范围测试</h3>
+        <button onclick="testSafeIntegerRange()">测试安全整数范围</button>
+        <div id="safe-range-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 大整数精度丢失测试</h3>
+        <button onclick="testPrecisionLoss()">测试精度丢失</button>
+        <div id="precision-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. 格式化函数测试</h3>
+        <button onclick="testFormatFunction()">测试格式化函数</button>
+        <div id="format-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 实际群组ID测试</h3>
+        <button onclick="testRealGroupIds()">测试实际群组ID</button>
+        <div id="real-id-result" class="test-result"></div>
+    </div>
+
+    <script>
+        // 引入格式化函数
+        function formatLargeNumber(num) {
+            if (num === null || num === undefined) return '-';
+            
+            // 如果数字在JavaScript安全范围内，使用标准格式化
+            if (num <= Number.MAX_SAFE_INTEGER) {
+                return num.toLocaleString('zh-CN');
+            }
+            
+            // 对于超出安全范围的大整数，直接返回字符串
+            return num.toString();
+        }
+        
+        function testSafeIntegerRange() {
+            const result = document.getElementById('safe-range-result');
+            const maxSafe = Number.MAX_SAFE_INTEGER;
+            const minSafe = Number.MIN_SAFE_INTEGER;
+            
+            result.innerHTML = `
+                <div class="success">
+                    <strong>JavaScript安全整数范围：</strong><br>
+                    最大值: ${maxSafe.toLocaleString('zh-CN')}<br>
+                    最小值: ${minSafe.toLocaleString('zh-CN')}<br>
+                    超出此范围的整数会丢失精度
+                </div>
+            `;
+        }
+        
+        function testPrecisionLoss() {
+            const result = document.getElementById('precision-result');
+            
+            // 测试超出安全范围的大整数
+            const largeNumber = 1234567890123456789;
+            const largerNumber = 9999999999999999999;
+            
+            result.innerHTML = `
+                <div class="warning">
+                    <strong>精度丢失测试：</strong><br>
+                    原始值: ${largeNumber.toString()}<br>
+                    JavaScript显示: ${largeNumber}<br>
+                    格式化后: ${formatLargeNumber(largeNumber)}<br><br>
+                    
+                    更大的数: ${largerNumber.toString()}<br>
+                    JavaScript显示: ${largerNumber}<br>
+                    格式化后: ${formatLargeNumber(largerNumber)}
+                </div>
+            `;
+        }
+        
+        function testFormatFunction() {
+            const result = document.getElementById('format-result');
+            
+            const testNumbers = [
+                123,                           // 小整数
+                1234567,                       // 中等整数
+                1234567890123456,              // 安全范围内的大整数
+                1234567890123456789,           // 超出安全范围的大整数
+                9999999999999999999,           // 更大的整数
+                null,                          // null值
+                undefined,                     // undefined值
+            ];
+            
+            let html = '<div class="success"><strong>格式化函数测试：</strong><br>';
+            
+            testNumbers.forEach((num, index) => {
+                const formatted = formatLargeNumber(num);
+                const isSafe = num !== null && num !== undefined && num <= Number.MAX_SAFE_INTEGER;
+                const status = isSafe ? '✅ 安全' : '⚠️ 超出安全范围';
+                
+                html += `${index + 1}. 输入: ${num} | 输出: ${formatted} | ${status}<br>`;
+            });
+            
+            html += '</div>';
+            result.innerHTML = html;
+        }
+        
+        function testRealGroupIds() {
+            const result = document.getElementById('real-id-result');
+            
+            // 模拟一些可能的群组ID
+            const mockGroupIds = [
+                1,                              // 小ID
+                12345,                         // 中等ID
+                1234567890123456,              // 安全范围内的大ID
+                1234567890123456789,           // 可能超出安全范围的ID
+                9999999999999999999,           // 明显超出安全范围的ID
+            ];
+            
+            let html = '<div class="success"><strong>模拟群组ID测试：</strong><br>';
+            
+            mockGroupIds.forEach((id, index) => {
+                const formatted = formatLargeNumber(id);
+                const isSafe = id <= Number.MAX_SAFE_INTEGER;
+                const status = isSafe ? '✅ 安全' : '⚠️ 需要修复';
+                
+                html += `
+                    ID ${index + 1}: ${id}<br>
+                    &nbsp;&nbsp;格式化: ${formatted}<br>
+                    &nbsp;&nbsp;状态: ${status}<br><br>
+                `;
+            });
+            
+            html += '</div>';
+            result.innerHTML = html;
+        }
+        
+        // 页面加载时自动运行基础测试
+        window.onload = function() {
+            testSafeIntegerRange();
+        };
+    </script>
+</body>
+</html>
+

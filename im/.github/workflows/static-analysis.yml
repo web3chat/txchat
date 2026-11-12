@@ -1,0 +1,13 @@
+# 已停用自动触发，避免每次 push 收到 static-analysis 失败邮件。
+# 需要时在 Actions 页手动 Run workflow，或恢复 push/pull_request 触发。
+name: static-analysis
+on:
+  workflow_dispatch:
+
+jobs:
+  skipped:
+    name: disabled
+    runs-on: ubuntu-22.04
+    steps:
+      - name: workflow disabled
+        run: echo "static-analysis 已停用自动触发；如需启用请改 .github/workflows/static-analysis.yml"

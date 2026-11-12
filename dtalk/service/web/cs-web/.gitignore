@@ -1,0 +1,7 @@
+.env
+.env.local
+.env.*.local
+
+# start.sh daemon
+cs-web-dev.log
+cs-web-dev.pid
