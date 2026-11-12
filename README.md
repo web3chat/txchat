@@ -33,7 +33,9 @@ make build_linux_amd64
 
 ## 部署
 
-完整部署步骤见 [`部署.md`](部署.md)。部署前请阅读其中的目录要求、`run_compose/.env` 密码说明和启动顺序。
+源码构建部署：完整步骤见 [`部署.md`](部署.md)。部署前请阅读其中的目录要求、`run_compose/.env` 密码说明和启动顺序。
+
+也可以使用配套的一键自动化部署仓库 [web3chat/txchat-release](https://github.com/web3chat/txchat-release)。该仓库提供预构建镜像，执行 `bash ./deploy.sh --download` 即可下载镜像并启动全套服务，不需要源码或 Go 环境；部署所用的镜像包以该仓库的 Release 为准。
 
 ## 配置与密钥
 
