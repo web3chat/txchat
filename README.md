@@ -48,3 +48,9 @@ make build_linux_amd64
 本项目基于 [txchat](https://github.com/txchat) 的 dtalk / im / imparse 项目（MIT License）继续开发，并保留原版权声明。新增和修改部分由 web3chat 维护。
 
 上游依赖 `github.com/txchat/im-pkg` 仍按原 module path 引用。许可全文见 [`LICENSE`](LICENSE)。
+
+## 免责声明
+
+本项目的全部内容，包括但不限于代码、文件和技术资料，只供学习、研究使用。请勿用于学习、研究以外的其他用途。
+
+使用者应自行承担使用本项目产生的一切风险和责任；作者及维护者不对因使用本项目造成的任何直接或间接损失负责。
