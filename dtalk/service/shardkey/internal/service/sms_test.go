@@ -20,7 +20,7 @@ func testConfig() *config.Config {
 func TestSMSServicePhoneValidation(t *testing.T) {
 	svc := NewSMSService(testConfig(), NewMemoryVerificationStore())
 
-	validPhones := []string{"18957151380", "13800138000"}
+	validPhones := []string{"13800138000", "13900139000"}
 	invalidPhones := []string{"123", "1380013800", "138001380000", "abc12345678"}
 
 	for _, phone := range validPhones {
@@ -50,7 +50,7 @@ func TestVerifyCodeWithPurpose(t *testing.T) {
 	store := NewMemoryVerificationStore()
 	svc := NewSMSService(cfg, store)
 
-	phone := "18957151380"
+	phone := "13800138000"
 	rec := &VerificationCode{
 		Code:      "123456",
 		Phone:     phone,
@@ -83,7 +83,7 @@ func TestVerifyCodeAttemptsLock(t *testing.T) {
 	store := NewMemoryVerificationStore()
 	svc := NewSMSService(cfg, store)
 
-	phone := "18957151380"
+	phone := "13800138000"
 	if err := store.Save(phone, &VerificationCode{
 		Code: "123456", Phone: phone, Purpose: "backup", CreatedAt: time.Now(),
 	}, time.Duration(cfg.Code.Expire)); err != nil {
@@ -104,11 +104,11 @@ func TestVerifyCodeAttemptsLock(t *testing.T) {
 
 func TestSendLock(t *testing.T) {
 	store := NewMemoryVerificationStore()
-	ok, err := store.TrySendLock("18957151380", time.Minute)
+	ok, err := store.TrySendLock("13800138000", time.Minute)
 	if err != nil || !ok {
 		t.Fatalf("first lock should succeed: ok=%v err=%v", ok, err)
 	}
-	ok, err = store.TrySendLock("18957151380", time.Minute)
+	ok, err = store.TrySendLock("13800138000", time.Minute)
 	if err != nil || ok {
 		t.Fatalf("second lock should be rejected: ok=%v err=%v", ok, err)
 	}
