@@ -5,6 +5,8 @@ FROM golang:1.17.8 AS builder
 ## the lightweight scratch image we'll
 ## run our application within
 FROM alpine:latest
+## CA certificates: 短信 / HTTPS 出站请求需要
+RUN apk --no-cache add ca-certificates
 ## We have to copy the output from our
 ## builder stage to our production stage
 ARG server_name

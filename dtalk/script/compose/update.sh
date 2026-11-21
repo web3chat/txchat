@@ -13,8 +13,8 @@ TARGETDIR="${TARGETDIR:-target}"
 # 可选：REFRESH_CONFIG=1 时把仓库内 toml 覆盖进配置卷（默认不覆盖，避免冲掉线上改动）
 REFRESH_CONFIG="${REFRESH_CONFIG:-0}"
 
-ALL_SERVERS="answer backend backup call device discovery gateway generator group offline-push oss pusher store chatclean chatadmin federation"
-MYSQL_SERVICES="backend backup device group store chatclean chatadmin federation gateway pusher"
+ALL_SERVERS="answer backend backup call device discovery gateway generator group offline-push oss pusher store chatclean chatadmin shardkey federation"
+MYSQL_SERVICES="backend backup device group store chatclean chatadmin shardkey federation gateway pusher"
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 need_cmd() { command -v "$1" >/dev/null 2>&1 || die "未找到命令 '$1'"; }
@@ -168,6 +168,16 @@ for sName in "${MODULES[@]}"; do
   if is_in_list "${sName}" "${MYSQL_SERVICES}"; then
     [[ -n "${MYSQL_ROOT_PASSWORD}" ]] || die ".env 缺少 MYSQL_ROOT_PASSWORD（${sName} 需要）"
     run_args+=(-e "MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}")
+  fi
+
+  # shardkey 的密钥/短信/App Token 都在 .env 里，热更新时必须一并注入
+  if [[ "${sName}" == "shardkey" ]]; then
+    for key in SHARDKEY_ENV SHARDKEY_ENCRYPT_KEY SUBMAIL_APP_ID SUBMAIL_APP_KEY SUBMAIL_SIGNATURE SHARDKEY_IOS_APP_TOKEN SHARDKEY_ANDROID_APP_TOKEN; do
+      val="$(env_get "${key}" "${ENV_FILE}")"
+      if [[ -n "${val}" ]]; then
+        run_args+=(-e "${key}=${val}")
+      fi
+    done
   fi
 
   # federation Bridge gRPC / admin 必须映射到宿主，否则跨机 Presence 注册地址不可达

@@ -1,0 +1,48 @@
+# shardkey 分片密钥服务配置（compose / 容器内）
+# 真实密钥由 compose 环境变量注入，仓库不保存明文。
+
+Env = "release"
+
+[HttpServer]
+Addr = "0.0.0.0:18006"
+
+[MySQL]
+Host = "txchat-mysql"
+Port = 3306
+User = "root"
+Pwd = "${MYSQL_PASSWORD}"
+Db = "dtalk"
+Charset = "utf8mb4"
+Timezone = "Asia/Shanghai"
+
+[Redis]
+Network = "tcp"
+Addr = "txchat-redis:6379"
+Auth = ""
+Active = 60000
+Idle = 1024
+DialTimeout = "200ms"
+ReadTimeout = "500ms"
+WriteTimeout = "500ms"
+IdleTimeout = "120s"
+Expire = "30m"
+
+[SMS]
+AppID = "${SUBMAIL_APP_ID}"
+AppKey = "${SUBMAIL_APP_KEY}"
+Signature = "${SUBMAIL_SIGNATURE}"
+Template = "您的验证码是：%s，用于%s，请在5分钟内使用。如非本人操作，请忽略。"
+
+[Code]
+Length = 6
+Expire = "5m"
+RetryInterval = "60s"
+MaxAttempts = 5
+LockDuration = "10m"
+
+[Security]
+EncryptKey = "${SHARDKEY_ENCRYPT_KEY}"
+
+[APIKeys]
+ios_txchatapp = "${SHARDKEY_IOS_APP_TOKEN}"
+android_txchatapp = "${SHARDKEY_ANDROID_APP_TOKEN}"

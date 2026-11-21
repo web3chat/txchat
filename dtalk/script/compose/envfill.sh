@@ -68,6 +68,16 @@ if [[ -z "${MYSQL_ROOT_PASSWORD:-}" || -z "${MINIO_ROOT_PASSWORD:-}" ]]; then
   exit 1
 fi
 
+# 分片密钥加密密钥：留空时自动生成。生成后必须保持不变，否则旧分片无法解密。
+# 若已有 .env（重复执行 init-compose），优先沿用旧值，避免误轮换。
+if [[ -z "${SHARDKEY_ENCRYPT_KEY:-}" && -f .env ]]; then
+  SHARDKEY_ENCRYPT_KEY="$(grep -E '^SHARDKEY_ENCRYPT_KEY=' .env | head -1 | cut -d= -f2- | tr -d '\r' || true)"
+fi
+if [[ -z "${SHARDKEY_ENCRYPT_KEY:-}" ]]; then
+  SHARDKEY_ENCRYPT_KEY="$(rand_password)"
+  echo "info: SHARDKEY_ENCRYPT_KEY 为空，已自动生成（写入 .env，请勿更换）" >&2
+fi
+
 eval "cat <<EOF
 $(cat env_tmpl)
 EOF

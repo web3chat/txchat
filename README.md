@@ -4,7 +4,7 @@ TXChat 是一个基于 Go 的分布式即时通讯系统。本仓库是源码单
 
 | 目录 | Module | 说明 |
 |------|--------|------|
-| `dtalk/` | `github.com/web3chat/txchat/dtalk` | 业务服务：gateway、auth、backend、group、record、call、oss、backup、chatadmin、chatclean、cs 等 |
+| `dtalk/` | `github.com/web3chat/txchat/dtalk` | 业务服务：gateway、auth、backend、group、record、call、oss、backup、chatadmin、chatclean、cs、shardkey 等 |
 | `dtalk/service/square/` | `github.com/web3chat/txchat/dtalk/service/square` | 广场服务，独立 module |
 | `im/` | `github.com/web3chat/txchat/im` | 接入层：comet 长连接、logic 调度 |
 | `imparse/` | `github.com/web3chat/txchat/imparse` | 消息协议解析库 |

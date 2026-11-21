@@ -65,7 +65,7 @@ endif
 # 默认单集群：不编译/不启动 federation，不依赖 Presence
 FEDERATION_ENABLED ?= false
 
-base_servers=answer backend backup call device discovery gateway generator group offline-push oss pusher store chatclean chatadmin
+base_servers=answer backend backup call device discovery gateway generator group offline-push oss pusher store chatclean chatadmin shardkey
 servers=$(base_servers)
 ifeq ($(FEDERATION_ENABLED),true)
 servers += federation

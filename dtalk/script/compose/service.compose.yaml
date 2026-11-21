@@ -36,6 +36,32 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+  shardkey:
+    image: txchat-shardkey:${SHARDKEY_IMAGE}
+    container_name: ${SHARDKEY_CONTAINER_NAME}
+    environment:
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SHARDKEY_ENV: ${SHARDKEY_ENV:-release}
+      SHARDKEY_ENCRYPT_KEY: ${SHARDKEY_ENCRYPT_KEY}
+      SUBMAIL_APP_ID: ${SUBMAIL_APP_ID}
+      SUBMAIL_APP_KEY: ${SUBMAIL_APP_KEY}
+      SUBMAIL_SIGNATURE: ${SUBMAIL_SIGNATURE}
+      SHARDKEY_IOS_APP_TOKEN: ${SHARDKEY_IOS_APP_TOKEN}
+      SHARDKEY_ANDROID_APP_TOKEN: ${SHARDKEY_ANDROID_APP_TOKEN}
+    networks:
+      - txchat-components
+      - txchat-service
+    volumes:
+      - ${SHARDKEY_CONFIG_VOLUME}:/etc/txchat-shardkey/config
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:18006/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
   call:
     image: txchat-call:${CALL_IMAGE}
     container_name: ${CALL_CONTAINER_NAME}
@@ -196,6 +222,8 @@ volumes:
   txchat-backend-config:
     external: true
   txchat-backup-config:
+    external: true
+  txchat-shardkey-config:
     external: true
   txchat-call-config:
     external: true

@@ -68,6 +68,25 @@ BACKUP_CONTAINER_NAME=txchat-backup-node1
 # backup配置卷
 BACKUP_CONFIG_VOLUME=txchat-backup-config
 
+## SHARDKEY（手机号分片密钥 / 账号绑定）
+# shardkey服务镜像
+SHARDKEY_IMAGE=v0.0.0
+# shardkey容器名称
+SHARDKEY_CONTAINER_NAME=txchat-shardkey-node1
+# shardkey配置卷
+SHARDKEY_CONFIG_VOLUME=txchat-shardkey-config
+# release：真实发短信；debug：mock 短信（只打日志，本地联调用）
+SHARDKEY_ENV=${SHARDKEY_ENV:-release}
+# 分片密钥落库加密密钥：留空时 envfill 自动生成，生成后不要随意更换（会导致旧分片无法解密）
+SHARDKEY_ENCRYPT_KEY=${SHARDKEY_ENCRYPT_KEY:-}
+# 赛邮短信（生产环境必须填写；仓库不保存真实值）
+SUBMAIL_APP_ID=${SUBMAIL_APP_ID:-}
+SUBMAIL_APP_KEY=${SUBMAIL_APP_KEY:-}
+SUBMAIL_SIGNATURE=${SUBMAIL_SIGNATURE:-}
+# App 端 X-App-Token（与 Chat-iOS / ChatPro-Android 的请求头一致；必须更换为私有值）
+SHARDKEY_IOS_APP_TOKEN=${SHARDKEY_IOS_APP_TOKEN:-change_me_ios}
+SHARDKEY_ANDROID_APP_TOKEN=${SHARDKEY_ANDROID_APP_TOKEN:-change_me_android}
+
 ## CALL
 # call服务镜像
 CALL_IMAGE=v0.0.0
