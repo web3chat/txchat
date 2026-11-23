@@ -1,5 +1,7 @@
 # TXChat
 
+当前版本：**V1.0**（源码版本号 `1.0.0`，对应 git tag `v1.0.0`；见根目录 [`VERSION`](VERSION)）。
+
 TXChat 是一个基于 Go 的分布式即时通讯系统。本仓库是源码单仓库，包含四个 Go module：
 
 | 目录 | Module | 说明 |
